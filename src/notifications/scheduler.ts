@@ -1,15 +1,21 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+const IS_WEB = Platform.OS === 'web';
+
 // ─── Configuration globale ─────────────────────────────────────────
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// expo-notifications n'a pas de support natif sur le web — on n'enregistre
+// le handler qu'en natif pour éviter les warnings et crashes.
+if (!IS_WEB) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 export type NotifPrefs = {
   hydration: boolean;
@@ -30,6 +36,7 @@ const TAG_WEIGHIN = 'natty.weighin';
 const TAG_RESERVATION = 'natty.reservation';
 
 export async function ensurePermission(): Promise<boolean> {
+  if (IS_WEB) return false;
   const status = await Notifications.getPermissionsAsync();
   if (status.granted) return true;
   if (!status.canAskAgain) return false;
@@ -38,6 +45,7 @@ export async function ensurePermission(): Promise<boolean> {
 }
 
 async function cancelByTag(tag: string) {
+  if (IS_WEB) return;
   const all = await Notifications.getAllScheduledNotificationsAsync();
   await Promise.all(
     all
@@ -47,6 +55,7 @@ async function cancelByTag(tag: string) {
 }
 
 export async function cancelAll() {
+  if (IS_WEB) return;
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
@@ -89,6 +98,7 @@ function isoToIosWeekday(iso: number): number {
 }
 
 export async function scheduleDailyReminders(schedule: NotifSchedule) {
+  if (IS_WEB) return;
   const { prefs } = schedule;
   // On nettoie d'abord ce qui pourrait subsister
   await cancelByTag(TAG_HYDRATION);
@@ -129,6 +139,7 @@ export async function scheduleDailyReminders(schedule: NotifSchedule) {
 
 // ─── Reservations ───────────────────────────────────────────────────
 export async function scheduleReservationNotif(reservationId: string, pickupTimestamp: number, fridgeName: string) {
+  if (IS_WEB) return;
   // Annulation préalable au cas où on re-schedule
   await cancelReservationNotif(reservationId);
 
@@ -167,6 +178,7 @@ export async function scheduleReservationNotif(reservationId: string, pickupTime
 }
 
 export async function cancelReservationNotif(reservationId: string) {
+  if (IS_WEB) return;
   await Notifications.cancelScheduledNotificationAsync(`${TAG_RESERVATION}.${reservationId}.before`).catch(() => {});
   await Notifications.cancelScheduledNotificationAsync(`${TAG_RESERVATION}.${reservationId}.now`).catch(() => {});
 }

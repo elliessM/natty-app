@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { Pedometer } from 'expo-sensors';
 import { useUserStore } from '../store/useUserStore';
 
@@ -22,6 +23,12 @@ export function useSteps(): StepsState {
   useEffect(() => {
     let cancelled = false;
     let subscription: { remove: () => void } | null = null;
+
+    // Pedometer indisponible sur le web — on sort silencieusement.
+    if (Platform.OS === 'web') {
+      setAvailable(false);
+      return;
+    }
 
     (async () => {
       try {

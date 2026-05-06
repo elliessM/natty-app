@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "fr.natty.app",
-      "icon": "./assets/logos/logo-beige-on-green.png"
+      "icon": "./assets/logos/logo-beige-on-green.png",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "fr.natty.app",
@@ -28,11 +31,25 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/logos/logo-beige-on-green.png",
+      "name": "Natty",
+      "shortName": "Natty",
+      "lang": "fr",
+      "themeColor": "#00412f",
+      "backgroundColor": "#00412f",
+      "description": "Ton frigo intelligent post-entraînement. Scanne, mange bien, progresse.",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/"
     },
     "plugins": [
       "expo-font",
@@ -69,6 +86,12 @@
         "projectId": "ed537da2-9e12-43c3-bec9-c7860c9f4186"
       }
     },
-    "owner": "elliessmahir"
+    "owner": "elliessmahir",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ed537da2-9e12-43c3-bec9-c7860c9f4186"
+    }
   }
 }
