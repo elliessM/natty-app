@@ -40,7 +40,7 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/logos/logo-beige-on-green.png",
+      "favicon": "./public/icon-192.png",
       "name": "Natty",
       "shortName": "Natty",
       "lang": "fr",
