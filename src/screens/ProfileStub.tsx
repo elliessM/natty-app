@@ -15,6 +15,14 @@ import { useAuthStore } from '../store/useAuthStore';
 import { hapticLight, hapticSelection, hapticSuccess, hapticWarning } from '../shared/haptics';
 import { seedDemoData, clearDemoData } from '../data/demoSeed';
 import WeighInSheet from '../shared/WeighInSheet';
+import {
+  isWebPushSupported,
+  isIosStandaloneRequired,
+  subscribeAndSync,
+  unsubscribe,
+  sendTestNotification,
+} from '../api/webpush';
+import { Platform } from 'react-native';
 import type { ActivityLevel, Goal, Sex } from '../types';
 
 const SEXES: Array<{ id: Sex; label: string }> = [
@@ -50,7 +58,62 @@ export default function Profile() {
   const userResetLocal = useUserStore((s) => s.reset);
 
   const [weighInOpen, setWeighInOpen] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushHint, setPushHint] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState(user.name);
+  const authUserId = useAuthStore((s) => s.user?.id ?? null);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'web' || !isWebPushSupported()) return;
+    (async () => {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const sub = await reg?.pushManager?.getSubscription();
+      setPushEnabled(!!sub);
+    })();
+  }, []);
+
+  const togglePush = async (next: boolean) => {
+    if (!authUserId) return;
+    if (!isWebPushSupported()) {
+      setPushHint('Notifications push non supportées sur ce navigateur.');
+      return;
+    }
+    if (next && isIosStandaloneRequired()) {
+      setPushHint("Sur iPhone, ajoute d'abord Natty à l'écran d'accueil (Safari → Partager → Sur l'écran d'accueil).");
+      return;
+    }
+    setPushBusy(true);
+    setPushHint(null);
+    if (next) {
+      const r = await subscribeAndSync(authUserId);
+      if (r.ok) {
+        setPushEnabled(true);
+        hapticSuccess();
+      } else {
+        setPushHint(reasonToFr(r.reason));
+        hapticWarning();
+      }
+    } else {
+      await unsubscribe(authUserId);
+      setPushEnabled(false);
+      hapticLight();
+    }
+    setPushBusy(false);
+  };
+
+  const sendTest = async () => {
+    setPushBusy(true);
+    const r = await sendTestNotification();
+    setPushBusy(false);
+    if (r.ok) {
+      hapticSuccess();
+      setPushHint('Envoyée ! Tu devrais recevoir la notification dans quelques secondes.');
+    } else {
+      hapticWarning();
+      setPushHint(r.error ?? 'Échec d\'envoi.');
+    }
+  };
   const [emailDraft, setEmailDraft] = useState(user.email);
   const [weightDraft, setWeightDraft] = useState(String(user.weightKg));
   const [targetWeightDraft, setTargetWeightDraft] = useState(String(user.targetWeightKg));
@@ -600,6 +663,39 @@ export default function Profile() {
           </Pressable>
         </Card>
 
+        {/* Notifications push */}
+        {Platform.OS === 'web' ? (
+          <Card title="NOTIFICATIONS PUSH" subtitle="Rappels même quand l'app est fermée">
+            <SettingToggle
+              label={pushEnabled ? 'Push activées' : 'Activer les notifications'}
+              sublabel={pushEnabled ? 'Tu peux les désactiver à tout moment' : 'Hydratation, repas, rappels résa'}
+              value={pushEnabled}
+              onChange={togglePush}
+            />
+            {pushEnabled ? (
+              <Pressable
+                onPress={sendTest}
+                disabled={pushBusy}
+                style={{
+                  marginTop: 12,
+                  paddingVertical: 10,
+                  borderRadius: 999,
+                  borderWidth: 1.5,
+                  borderColor: C.green,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: C.green, fontWeight: '700', fontSize: 13 }}>
+                  {pushBusy ? 'Envoi…' : '🔔 Envoyer une notif test'}
+                </Text>
+              </Pressable>
+            ) : null}
+            {pushHint ? (
+              <Text style={{ marginTop: 10, fontSize: 11, color: C.darkSoft, lineHeight: 16 }}>{pushHint}</Text>
+            ) : null}
+          </Card>
+        ) : null}
+
         {/* Session */}
         <Card title="SESSION" subtitle={authEmail ? `Connecté en tant que ${authEmail}` : 'Mode local'}>
           <Pressable
@@ -873,6 +969,17 @@ function SettingPills<T extends string>({
       </View>
     </View>
   );
+}
+
+function reasonToFr(reason?: string): string {
+  if (!reason) return 'Erreur inconnue.';
+  if (reason === 'unsupported') return 'Ton navigateur ne supporte pas Web Push.';
+  if (reason === 'ios-not-standalone')
+    return "Sur iPhone : ajoute Natty à l'écran d'accueil avant d'activer les notifs.";
+  if (reason === 'sw-failed') return 'Impossible de démarrer le service worker.';
+  if (reason === 'permission-denied') return 'Tu as refusé les notifications dans les réglages du navigateur.';
+  if (reason === 'missing-vapid') return 'La clé VAPID publique n\'est pas configurée dans le code.';
+  return reason;
 }
 
 function describeActivity(a: ActivityLevel): string {
