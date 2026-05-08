@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, Pressable, ScrollView, Animated, Easing } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -76,6 +76,21 @@ export default function SmartMap() {
   const searchTop = insets.top + 8;
   const filtersTop = searchTop + 62;
   const { coords, granted } = useLocation();
+
+  // Bottom sheet : 2 positions (collapsed / expanded), tap sur handle pour toggle.
+  const COLLAPSED_TOP = 506;
+  const EXPANDED_TOP = filtersTop + 60;
+  const [expanded, setExpanded] = useState(false);
+  const sheetTop = useRef(new Animated.Value(COLLAPSED_TOP)).current;
+
+  useEffect(() => {
+    Animated.timing(sheetTop, {
+      toValue: expanded ? EXPANDED_TOP : COLLAPSED_TOP,
+      duration: 280,
+      easing: Easing.bezier(0.2, 0.7, 0.3, 1),
+      useNativeDriver: false,
+    }).start();
+  }, [expanded]);
 
   const sortedFridges = useMemo(() => {
     return FRIDGES.map((f) => {
@@ -239,23 +254,35 @@ export default function SmartMap() {
         <IconRecenter />
       </View>
 
-      <View
+      <Animated.View
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
           bottom: 0,
-          top: 506,
+          top: sheetTop,
           backgroundColor: C.white,
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
-          paddingTop: 10,
+          paddingTop: 6,
           overflow: 'hidden',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -6 },
+          shadowOpacity: 0.08,
+          shadowRadius: 16,
+          elevation: 6,
         }}
       >
-        <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0' }} />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, paddingHorizontal: 20, paddingBottom: 4 }}>
-          <Text style={{ fontSize: 15, fontWeight: '700', color: C.dark }}>Natty Fridges proches</Text>
+        <Pressable
+          onPress={() => setExpanded((v) => !v)}
+          accessibilityLabel={expanded ? 'Réduire la liste' : 'Agrandir la liste'}
+          hitSlop={10}
+          style={{ paddingVertical: 8, alignItems: 'center' }}
+        >
+          <View style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: '#cfc7bd' }} />
+        </Pressable>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6, paddingHorizontal: 20, paddingBottom: 4 }}>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: C.dark }}>Frigos Natty proches</Text>
           <Text style={{ fontSize: 10, color: C.green, fontWeight: '500' }}>
             {sortedFridges.filter((f) => f.open).length} disponibles
           </Text>
@@ -311,7 +338,7 @@ export default function SmartMap() {
                   {f.open ? (
                     isSel ? (
                       <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Réserver →</Text>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander →</Text>
                       </View>
                     ) : (
                       <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>
@@ -324,7 +351,7 @@ export default function SmartMap() {
             );
           })}
         </ScrollView>
-      </View>
+      </Animated.View>
     </View>
   );
 }

@@ -5,8 +5,17 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { C, F, cardShadow } from '../tokens';
 import { hapticSelection, hapticMedium } from './haptics';
 
-// Créneaux pré-définis (raccourcis) + option "Personnalisé" qui ouvre le picker.
-const SLOTS = [10, 12, 14, 17, 19, 21];
+// Créneaux pré-définis : 9h → 21h tous les 30 min (en minutes depuis minuit).
+const SLOTS: Array<{ h: number; m: number }> = (() => {
+  const arr: Array<{ h: number; m: number }> = [];
+  for (let h = 9; h <= 21; h++) {
+    arr.push({ h, m: 0 });
+    if (h < 21) arr.push({ h, m: 30 });
+  }
+  return arr;
+})();
+
+const DAY_OFFSETS = [0, 1, 2, 3, 4, 5, 6];
 
 type Props = {
   visible: boolean;
@@ -47,20 +56,24 @@ function formatHm(ts: number): string {
 export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title, subtitle, ctaLabel }: Props) {
   const insets = useSafeAreaInsets();
   const [dayOffset, setDayOffset] = useState(0);
-  const [slotHour, setSlotHour] = useState<number | null>(null);
+  const [slotKey, setSlotKey] = useState<string | null>(null); // "HH:MM"
   const [customTs, setCustomTs] = useState<number | null>(null);
   const [customPickerVisible, setCustomPickerVisible] = useState(false);
 
   const availableSlots = useMemo(() => {
     const now = Date.now();
-    return SLOTS.map((h) => ({ h, ts: slotTimestamp(dayOffset, h), past: slotTimestamp(dayOffset, h) < now }));
+    return SLOTS.map(({ h, m }) => {
+      const ts = slotTimestamp(dayOffset, h, m);
+      return { h, m, ts, key: `${h}:${m}`, past: ts < now };
+    });
   }, [dayOffset]);
 
-  const selectedTs: number | null = customTs ?? (slotHour != null ? slotTimestamp(dayOffset, slotHour) : null);
+  const selectedSlot = slotKey ? availableSlots.find((s) => s.key === slotKey) : null;
+  const selectedTs: number | null = customTs ?? selectedSlot?.ts ?? null;
   const canConfirm = selectedTs != null && selectedTs > Date.now();
 
   const reset = () => {
-    setSlotHour(null);
+    setSlotKey(null);
     setCustomTs(null);
     setDayOffset(0);
     setCustomPickerVisible(false);
@@ -84,7 +97,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
     // On ne permet pas un horaire dans le passé.
     if (date.getTime() < Date.now()) return;
     setCustomTs(date.getTime());
-    setSlotHour(null);
+    setSlotKey(null);
     // Aligne la date-chip sur le jour choisi.
     const todayStart = startOfDay();
     const picked = startOfDay(date);
@@ -121,13 +134,13 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
         <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0', marginBottom: 14 }} />
 
         <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.dark, lineHeight: 24 }}>
-          {title ?? 'Réserver ton retrait'}
+          {title ?? 'Programmer ma commande'}
         </Text>
         {subtitle ? <Text style={{ fontSize: 12, color: C.darkSoft, marginTop: 6, lineHeight: 18 }}>{subtitle}</Text> : null}
 
         <Text style={sectionLabel}>JOUR</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 2 }} style={{ marginTop: 8 }}>
-          {[0, 1, 2, 3].map((offset) => {
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 2, paddingRight: 12 }} style={{ marginTop: 8 }}>
+          {DAY_OFFSETS.map((offset) => {
             const active = dayOffset === offset && customTs == null;
             return (
               <Pressable
@@ -135,7 +148,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
                 onPress={() => {
                   hapticSelection();
                   setDayOffset(offset);
-                  setSlotHour(null);
+                  setSlotKey(null);
                   setCustomTs(null);
                 }}
                 style={{
@@ -156,48 +169,51 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
         </ScrollView>
 
         <Text style={sectionLabel}>CRÉNEAU</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-          {availableSlots.map(({ h, past }) => {
-            const active = slotHour === h && customTs == null && !past;
+        <ScrollView
+          style={{ marginTop: 8, maxHeight: 220 }}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingBottom: 4 }}
+        >
+          {availableSlots.map(({ h, m, key, past }) => {
+            const active = slotKey === key && customTs == null && !past;
             return (
               <Pressable
-                key={h}
+                key={key}
                 disabled={past}
                 onPress={() => {
                   hapticSelection();
-                  setSlotHour(h);
+                  setSlotKey(key);
                   setCustomTs(null);
                 }}
                 style={{
-                  width: '31%',
-                  paddingVertical: 12,
-                  borderRadius: 14,
+                  width: '23.5%',
+                  paddingVertical: 10,
+                  borderRadius: 12,
                   backgroundColor: past ? '#f0eae2' : active ? C.orange : C.beige,
                   borderWidth: active ? 0 : 1.5,
                   borderColor: active ? C.orange : 'rgba(0,65,47,0.12)',
                   alignItems: 'center',
-                  opacity: past ? 0.4 : 1,
+                  opacity: past ? 0.35 : 1,
                 }}
               >
                 <Text
                   style={{
                     fontFamily: F.display,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: '900',
                     color: active ? C.beige : C.dark,
-                    lineHeight: 20,
+                    lineHeight: 17,
                   }}
                 >
-                  {String(h).padStart(2, '0')}:00
-                </Text>
-                <Text style={{ fontSize: 10, color: active ? C.lime : C.darkSoft, marginTop: 2 }}>
-                  {past ? 'Passé' : h < 12 ? 'Matin' : h < 17 ? 'Midi' : 'Soir'}
+                  {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}
                 </Text>
               </Pressable>
             );
           })}
+        </ScrollView>
 
-          {/* Pill "Personnalisé" */}
+        {/* Pill "Personnalisé" */}
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
           <Pressable
             onPress={() => {
               hapticSelection();
@@ -206,10 +222,10 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
                 setCustomTs(initialPickerDate().getTime());
               }
               setCustomPickerVisible(true);
-              setSlotHour(null);
+              setSlotKey(null);
             }}
             style={{
-              width: '65%',
+              flex: 1,
               paddingVertical: 12,
               borderRadius: 14,
               backgroundColor: customTs != null ? C.orange : C.beige,
@@ -297,7 +313,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
           }}
         >
           <Text style={{ color: canConfirm ? C.beige : C.green, fontWeight: '700', fontSize: 15 }}>
-            {ctaLabel ?? 'Confirmer la réservation'}
+            {ctaLabel ?? 'Confirmer la commande'}
           </Text>
         </Pressable>
 

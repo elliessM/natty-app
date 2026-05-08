@@ -32,12 +32,12 @@ export default function Reservations() {
 
   const confirmCancel = (r: Reservation) => {
     Alert.alert(
-      'Annuler la réservation ?',
+      'Annuler la commande ?',
       `${r.items.length} article${r.items.length > 1 ? 's' : ''} chez ${r.fridgeName} · ${formatPickupTime(r.pickupTimestamp)}`,
       [
         { text: 'Garder', style: 'cancel' },
         {
-          text: 'Annuler la résa',
+          text: 'Annuler la commande',
           style: 'destructive',
           onPress: () => {
             hapticWarning();
@@ -69,7 +69,7 @@ export default function Reservations() {
           <IconBack />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 11, letterSpacing: 3, color: C.green, fontWeight: '700' }}>MES RÉSERVATIONS</Text>
+          <Text style={{ fontSize: 11, letterSpacing: 3, color: C.green, fontWeight: '700' }}>MES COMMANDES</Text>
           <Text style={{ fontFamily: F.display, fontSize: 24, fontWeight: '900', color: C.dark, marginTop: 2 }}>
             {upcoming.length > 0 ? `${upcoming.length} à venir` : 'Aucune à venir'}
           </Text>
@@ -92,7 +92,7 @@ export default function Reservations() {
                 Réserve ton repas{'\n'}avant la séance
               </Text>
               <Text style={{ fontSize: 12, color: C.lime, opacity: 0.85, textAlign: 'center', lineHeight: 18, marginTop: 10, maxWidth: 280 }}>
-                Choisis un Smart Fridge, ton créneau de retrait, et viens chercher au moment qui t'arrange.
+                Choisis un frigo Natty, ton créneau de retrait, et viens chercher au moment qui t'arrange.
               </Text>
               <Pressable
                 onPress={() => {

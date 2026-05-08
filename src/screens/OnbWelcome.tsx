@@ -27,35 +27,19 @@ export default function OnbWelcome() {
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 32, paddingTop: insets.top + 40, paddingBottom: insets.bottom + 20 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <View
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Text
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: 22,
-              backgroundColor: C.lime,
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: C.lime,
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.25,
-              shadowRadius: 30,
-              elevation: 6,
+              fontFamily: F.display,
+              fontWeight: '900',
+              fontSize: 56,
+              color: C.lime,
+              lineHeight: 56,
+              letterSpacing: -2,
             }}
           >
-            <Text
-              style={{
-                fontFamily: F.display,
-                fontWeight: '900',
-                fontSize: 48,
-                color: C.green,
-                lineHeight: 48,
-                marginTop: -4,
-              }}
-            >
-              N
-            </Text>
-          </View>
+            N
+          </Text>
           <View>
             <Text style={{ fontSize: 11, letterSpacing: 4, fontWeight: '700', color: C.lime }}>NATTY</Text>
             <Text style={{ fontSize: 12, color: C.beige, opacity: 0.7, marginTop: 4 }}>v 2.1</Text>

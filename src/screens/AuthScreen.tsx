@@ -83,7 +83,7 @@ export default function AuthScreen() {
         </Text>
         <Text style={{ fontSize: 13, color: C.beige, opacity: 0.7, marginTop: 8, lineHeight: 19 }}>
           {mode === 'signin'
-            ? 'Retrouve ton journal, tes réservations et tes objectifs partout.'
+            ? 'Retrouve ton journal, tes commandes et tes objectifs partout.'
             : 'Sync cloud pour ne jamais perdre tes scans, ton historique et ton profil.'}
         </Text>
 

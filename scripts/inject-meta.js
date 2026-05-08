@@ -29,7 +29,37 @@ const tags = `
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Natty" />
   <meta name="theme-color" content="#00412f" />
+  <style>
+    html, body, #root {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    html, body {
+      position: fixed;
+      inset: 0;
+      margin: 0;
+      padding: 0;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+  </style>
 `;
+
+// On veut aussi un viewport qui empêche le pinch-zoom horizontal accidentel.
+const viewportFix = `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />`;
+html = html.replace(/<meta name="viewport"[^>]*>/i, viewportFix);
+if (!html.includes('name="viewport"')) {
+  html = html.replace('<head>', `<head>\n  ${viewportFix}`);
+}
 
 html = html.replace('</head>', `${tags}</head>`);
 fs.writeFileSync(indexPath, html);

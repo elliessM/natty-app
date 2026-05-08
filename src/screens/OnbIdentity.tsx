@@ -115,9 +115,24 @@ export default function OnbIdentity() {
                 fontWeight: '700',
                 color: C.dark,
                 padding: 0,
+                lineHeight: 22,
+                includeFontPadding: false,
+                textAlignVertical: 'center',
               }}
             />
-            <Text style={{ fontSize: 13, color: C.darkSoft, fontWeight: '600' }}>ans</Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: C.darkSoft,
+                fontWeight: '600',
+                lineHeight: 22,
+                marginLeft: 6,
+                includeFontPadding: false,
+                textAlignVertical: 'center',
+              }}
+            >
+              ans
+            </Text>
           </View>
         </View>
 

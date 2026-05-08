@@ -164,7 +164,7 @@ export function generateCoachTip(ctx: Ctx): CoachTip {
       headline: 'Tu as un retrait planifié',
       body: 'Pense à passer chercher ta commande au créneau prévu — on te rappelle 15 min avant.',
       tone: 'orange',
-      actions: [{ label: 'Voir mes résas', type: 'reservations' }],
+      actions: [{ label: 'Voir mes commandes', type: 'reservations' }],
       priority: 55,
     });
   }

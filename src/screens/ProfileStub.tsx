@@ -15,6 +15,8 @@ import { useAuthStore } from '../store/useAuthStore';
 import { hapticLight, hapticSelection, hapticSuccess, hapticWarning } from '../shared/haptics';
 import { seedDemoData, clearDemoData } from '../data/demoSeed';
 import WeighInSheet from '../shared/WeighInSheet';
+import WeightLineChart from '../shared/charts/WeightLineChart';
+import { useNavigation } from '@react-navigation/native';
 import {
   isWebPushSupported,
   isIosStandaloneRequired,
@@ -53,6 +55,9 @@ export default function Profile() {
   const clearJournal = useJournalStore((s) => s.clear);
   const authEmail = useAuthStore((s) => s.user?.email ?? null);
   const signOut = useAuthStore((s) => s.signOut);
+  const navigation = useNavigation<any>();
+  const weightHistory = user.weightHistory;
+  const weightDelta = weightHistory.length >= 2 ? weightHistory[weightHistory.length - 1].kg - weightHistory[0].kg : 0;
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
   const clearJournalLocal = useJournalStore((s) => s.clear);
   const userResetLocal = useUserStore((s) => s.reset);
@@ -332,6 +337,84 @@ export default function Profile() {
           </Pressable>
         </Card>
 
+        {/* Suivi du poids — courbe + accès rapide aux stats */}
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            navigation.getParent?.()?.navigate('HomeTab', { screen: 'Stats' });
+          }}
+          style={({ pressed }) => ({
+            marginHorizontal: 16,
+            marginTop: 16,
+            padding: 18,
+            backgroundColor: C.white,
+            borderRadius: 20,
+            opacity: pressed ? 0.95 : 1,
+            ...cardShadow,
+          })}
+        >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Text style={{ fontSize: 10, letterSpacing: 3, color: C.green, fontWeight: '700' }}>SUIVI DU POIDS</Text>
+            {weightHistory.length >= 2 ? (
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: '700',
+                  color: weightDelta < 0 ? C.green : weightDelta > 0 ? C.orange : C.darkSoft,
+                }}
+              >
+                {weightDelta > 0 ? '+' : ''}
+                {weightDelta.toFixed(1)} kg
+              </Text>
+            ) : null}
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 6, gap: 6 }}>
+            <Text style={{ fontFamily: F.display, fontSize: 32, fontWeight: '900', color: C.dark }}>
+              {user.weightKg.toFixed(1).replace('.', ',')}
+            </Text>
+            <Text style={{ fontSize: 14, color: C.darkSoft, fontWeight: '600' }}>kg</Text>
+            {user.targetWeightKg !== user.weightKg ? (
+              <Text style={{ fontSize: 11, color: C.darkSoft, marginLeft: 6 }}>
+                · objectif {user.targetWeightKg} kg
+              </Text>
+            ) : null}
+          </View>
+          {weightHistory.length >= 2 ? (
+            <View style={{ marginTop: 10 }}>
+              <WeightLineChart data={weightHistory} target={user.targetWeightKg} height={130} />
+            </View>
+          ) : (
+            <Text style={{ fontSize: 12, color: C.darkSoft, marginTop: 8, lineHeight: 17 }}>
+              Pèse-toi régulièrement pour voir ta courbe de progression apparaître ici.
+            </Text>
+          )}
+          <View
+            style={{
+              marginTop: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: 10,
+              borderTopWidth: 1,
+              borderTopColor: C.beige2,
+            }}
+          >
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation();
+                hapticLight();
+                setWeighInOpen(true);
+              }}
+              hitSlop={8}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <Text style={{ fontSize: 13 }}>⚖️</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: C.green }}>Peser aujourd'hui</Text>
+            </Pressable>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: C.green }}>Voir mes stats →</Text>
+          </View>
+        </Pressable>
+
         {/* Mes objectifs — paramétrables */}
         <Card title="MES OBJECTIFS" subtitle="Servent au tracking et aux rappels">
           {/* Hydratation */}
@@ -586,7 +669,7 @@ export default function Profile() {
                 }}
               />
               <SettingToggle
-                label="Réservations"
+                label="Commandes"
                 sublabel="15 min avant retrait"
                 value={user.notifPrefs.reservations}
                 onChange={(v) => {
@@ -629,7 +712,7 @@ export default function Profile() {
               hapticLight();
               Alert.alert(
                 'Supprimer mon compte ?',
-                'Toutes tes données (profil, journal, réservations, favoris) seront effacées du cloud. Cette action est irréversible.',
+                'Toutes tes données (profil, journal, commandes, favoris) seront effacées du cloud. Cette action est irréversible.',
                 [
                   { text: 'Annuler', style: 'cancel' },
                   {
@@ -668,7 +751,7 @@ export default function Profile() {
           <Card title="NOTIFICATIONS PUSH" subtitle="Rappels même quand l'app est fermée">
             <SettingToggle
               label={pushEnabled ? 'Push activées' : 'Activer les notifications'}
-              sublabel={pushEnabled ? 'Tu peux les désactiver à tout moment' : 'Hydratation, repas, rappels résa'}
+              sublabel={pushEnabled ? 'Tu peux les désactiver à tout moment' : 'Hydratation, repas, rappels commande'}
               value={pushEnabled}
               onChange={togglePush}
             />
@@ -732,7 +815,7 @@ export default function Profile() {
               seedDemoData();
               Alert.alert(
                 'Démo prête 🎬',
-                "Profil rempli, journal sur 7 jours, 1 réservation à venir, hydratation à 75%. Tu peux montrer l'app à n'importe qui."
+                "Profil rempli, journal sur 7 jours, 1 commande à venir, hydratation à 75%. Tu peux montrer l'app à n'importe qui."
               );
             }}
             style={{
@@ -751,7 +834,7 @@ export default function Profile() {
           <Pressable
             onPress={() => {
               hapticLight();
-              Alert.alert('Vider la démo ?', 'Efface journal, réservations, panier et hydratation. Le profil reste.', [
+              Alert.alert('Vider la démo ?', 'Efface journal, commandes, panier et hydratation. Le profil reste.', [
                 { text: 'Annuler', style: 'cancel' },
                 {
                   text: 'Vider',

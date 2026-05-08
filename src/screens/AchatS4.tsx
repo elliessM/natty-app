@@ -107,7 +107,7 @@ export default function AchatS4() {
         </Text>
         <Text style={{ fontSize: 14, color: C.lime, opacity: 0.8, marginTop: 10, lineHeight: 20, textAlign: 'center' }}>
           {phase === 0
-            ? 'On cherche le Smart Fridge à proximité...'
+            ? 'On cherche le frigo à proximité...'
             : phase === 1
             ? 'Ouverture automatique en cours'
             : 'Récupère tes articles sur l’étagère 2'}

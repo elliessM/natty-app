@@ -18,7 +18,18 @@ import type { MapStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<MapStackParamList, 'AchatS1'>;
 
-const FILTERS = ['Tout', 'Repas', 'Snacks', 'Boissons', 'Végé'];
+const FILTERS = ['Tout', 'Repas', 'Snacks', 'Boissons', 'Végé'] as const;
+type FilterId = (typeof FILTERS)[number];
+
+// Mapping explicite filter UI → catégorie produit (évite les replace('s','')
+// qui cassaient sur "Repas" → "Repa")
+const FILTER_TO_CAT: Record<FilterId, string | null> = {
+  'Tout': null,
+  'Repas': 'Repas',
+  'Snacks': 'Snack',
+  'Boissons': 'Boisson',
+  'Végé': 'Végé',
+};
 
 export default function AchatS1() {
   const navigation = useNavigation<Nav>();
@@ -50,9 +61,8 @@ export default function AchatS1() {
     navigation.getParent()?.navigate('HomeTab', { screen: 'Reservations' });
   };
 
-  const filtered = PRODUCTS.filter(
-    (p) => filter === 'Tout' || p.cat === filter.replace('s', '') || (filter === 'Végé' && p.cat === 'Végé')
-  );
+  const targetCat = FILTER_TO_CAT[filter as FilterId] ?? null;
+  const filtered = PRODUCTS.filter((p) => !targetCat || p.cat === targetCat);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.beige }}>
@@ -74,7 +84,7 @@ export default function AchatS1() {
           <IconBack />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 16, fontWeight: '700', color: C.dark }}>Smart Fridge</Text>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: C.dark }}>Frigo Natty</Text>
           <Text style={{ fontSize: 11, color: C.darkSoft, marginTop: 2 }}>Fitness Club Paris 11</Text>
         </View>
         <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 12, backgroundColor: C.lime }}>
@@ -298,7 +308,7 @@ export default function AchatS1() {
             }}
           >
             <Text style={{ fontSize: 14 }}>🕒</Text>
-            <Text style={{ color: C.green, fontWeight: '700', fontSize: 13 }}>Réserver pour plus tard</Text>
+            <Text style={{ color: C.green, fontWeight: '700', fontSize: 13 }}>Commander pour plus tard</Text>
           </Pressable>
         </View>
       ) : null}
@@ -307,9 +317,9 @@ export default function AchatS1() {
         visible={pickerOpen}
         onClose={() => setPickerOpen(false)}
         onConfirm={handleReserve}
-        title="Réserver ton retrait"
+        title="Programmer ma commande"
         subtitle={`Bloque ${items.length} article${items.length > 1 ? 's' : ''} chez ${currentFridge.name} pour le créneau de ton choix.`}
-        ctaLabel={`Réserver · ${formatPrice(subtotal * 0.95 + 0.3)} EUR`}
+        ctaLabel={`Programmer · ${formatPrice(subtotal * 0.95 + 0.3)} EUR`}
       />
     </View>
   );

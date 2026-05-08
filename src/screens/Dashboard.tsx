@@ -55,6 +55,7 @@ export default function Dashboard() {
   const hydrationMl = useUserStore((s) => s.hydrationMl);
   const hydrationGoalMl = useUserStore((s) => s.hydrationGoalMl);
   const addHydration = useUserStore((s) => s.addHydration);
+  const removeHydration = useUserStore((s) => s.removeHydration);
   const resetHydrationIfNewDay = useUserStore((s) => s.resetHydrationIfNewDay);
 
   // Macro targets from profile + today's totals from the journal → real "atteint %".
@@ -112,8 +113,17 @@ export default function Dashboard() {
     addHydration();
   };
 
-  const hydrationL = (hydrationMl / 1000).toFixed(1).replace('.', ',');
-  const hydrationTargetL = (hydrationGoalMl / 1000).toFixed(0);
+  const handleRemoveHydration = () => {
+    if (hydrationMl <= 0) return;
+    hapticLight();
+    removeHydration();
+  };
+
+  // Format litres FR avec max 2 décimales, sans zéros traînants → "0,25" / "1" / "1,5"
+  const formatL = (ml: number) =>
+    (ml / 1000).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const hydrationL = formatL(hydrationMl);
+  const hydrationTargetL = formatL(hydrationGoalMl);
   const hydrationPct = Math.min(hydrationMl / hydrationGoalMl, 1);
   const hydrationReached = hydrationMl >= hydrationGoalMl;
 
@@ -157,7 +167,20 @@ export default function Dashboard() {
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ color: C.beige, fontWeight: '700', fontSize: 15, fontFamily: F.display }}>{name[0]}</Text>
+              <Text
+                style={{
+                  color: C.beige,
+                  fontWeight: '700',
+                  fontSize: 18,
+                  fontFamily: F.display,
+                  lineHeight: 18,
+                  textAlign: 'center',
+                  includeFontPadding: false,
+                  textAlignVertical: 'center',
+                }}
+              >
+                {name[0]?.toUpperCase()}
+              </Text>
             </View>
             <View>
               <Text style={{ fontSize: 16, fontWeight: '700', color: C.dark }}>Hello {name} 👋</Text>
@@ -257,6 +280,52 @@ export default function Dashboard() {
 
         </FadeInView>
 
+        {/* Next reservation — remontée au top pour être super visible */}
+        {nextReservation ? (
+          <FadeInView delay={100}>
+            <Pressable
+              onPress={() => navigation.navigate('Reservations')}
+              style={({ pressed }) => ({
+                marginTop: 14,
+                marginHorizontal: 16,
+                padding: 16,
+                borderRadius: 20,
+                backgroundColor: reservationStatus(nextReservation) === 'ready' ? C.orange : C.green,
+                overflow: 'hidden',
+                opacity: pressed ? 0.9 : 1,
+                shadowColor: reservationStatus(nextReservation) === 'ready' ? C.orange : C.green,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.25,
+                shadowRadius: 18,
+                elevation: 6,
+              })}
+            >
+              <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.15)' }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Text style={{ fontSize: 28 }}>🕒</Text>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={{ fontSize: 10, letterSpacing: 2, color: C.lime, fontWeight: '700' }}>
+                    {reservationStatus(nextReservation) === 'ready' ? '● DISPO MAINTENANT' : 'PROCHAINE COMMANDE'}
+                  </Text>
+                  <Text style={{ fontSize: 16, fontFamily: F.display, fontWeight: '900', color: C.beige, marginTop: 4 }} numberOfLines={1}>
+                    {formatPickupTime(nextReservation.pickupTimestamp)}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: C.lime, opacity: 0.85, marginTop: 2 }} numberOfLines={1}>
+                    {nextReservation.fridgeName} · {nextReservation.items.length} article
+                    {nextReservation.items.length > 1 ? 's' : ''} ·{' '}
+                    {reservationStatus(nextReservation) === 'pending'
+                      ? countdownLabel(nextReservation.pickupTimestamp)
+                      : 'à récupérer'}
+                  </Text>
+                </View>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(252,233,218,0.18)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: C.beige, fontWeight: '700', fontSize: 18 }}>→</Text>
+                </View>
+              </View>
+            </Pressable>
+          </FadeInView>
+        ) : null}
+
         {/* Steps / hydration */}
         <FadeInView delay={150}>
         <View style={{ flexDirection: 'row', gap: 12, marginTop: 12, marginHorizontal: 16 }}>
@@ -273,47 +342,66 @@ export default function Dashboard() {
               </Text>
             </View>
           </View>
-          <Pressable
-            onPress={handleAddHydration}
-            accessibilityLabel={`Ajouter ${HYDRATION_STEP_ML} millilitres`}
-            style={({ pressed }) => [
+          <View
+            style={[
               statBox,
               {
                 justifyContent: 'space-between',
-                paddingRight: 10,
-                opacity: pressed ? 0.85 : 1,
+                paddingRight: 6,
                 borderColor: hydrationReached ? C.lime : C.beige2,
                 borderWidth: hydrationReached ? 1.5 : 1,
               },
             ]}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-              <WaterGlass pct={hydrationPct} size={36} reached={hydrationReached} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+              <WaterGlass pct={hydrationPct} size={32} reached={hydrationReached} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={{ fontWeight: '700', fontSize: 13, color: C.dark }} numberOfLines={1}>
                   {hydrationL} / {hydrationTargetL} L
                 </Text>
                 <Text style={{ fontSize: 10, color: C.darkSoft, marginTop: 1 }} numberOfLines={1}>
-                  {hydrationReached ? 'Objectif 🎉' : `+${HYDRATION_STEP_ML} mL`}
+                  {hydrationReached ? 'Objectif 🎉' : `${HYDRATION_STEP_ML} mL`}
                 </Text>
               </View>
             </View>
-            <View
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: 13,
-                backgroundColor: hydrationReached ? C.lime : C.orange,
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Text style={{ color: hydrationReached ? C.green : C.white, fontWeight: '700', fontSize: 18, lineHeight: 20, includeFontPadding: false }}>
-                +
-              </Text>
+            <View style={{ flexDirection: 'row', gap: 4, flexShrink: 0 }}>
+              <Pressable
+                onPress={handleRemoveHydration}
+                disabled={hydrationMl <= 0}
+                accessibilityLabel="Retirer 250 mL"
+                hitSlop={6}
+                style={({ pressed }) => ({
+                  width: 26,
+                  height: 26,
+                  borderRadius: 13,
+                  backgroundColor: hydrationMl <= 0 ? C.beige3 : C.beige,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.7 : hydrationMl <= 0 ? 0.5 : 1,
+                  borderWidth: 1,
+                  borderColor: 'rgba(0,65,47,0.12)',
+                })}
+              >
+                <Text style={{ color: C.dark, fontWeight: '700', fontSize: 16, lineHeight: 18, includeFontPadding: false }}>−</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleAddHydration}
+                accessibilityLabel="Ajouter 250 mL"
+                hitSlop={6}
+                style={({ pressed }) => ({
+                  width: 26,
+                  height: 26,
+                  borderRadius: 13,
+                  backgroundColor: hydrationReached ? C.lime : C.orange,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.85 : 1,
+                })}
+              >
+                <Text style={{ color: hydrationReached ? C.green : C.white, fontWeight: '700', fontSize: 16, lineHeight: 18, includeFontPadding: false }}>+</Text>
+              </Pressable>
             </View>
-          </Pressable>
+          </View>
         </View>
 
         {/* Hydration progress bar */}
@@ -390,45 +478,6 @@ export default function Dashboard() {
         </Pressable>
         </FadeInView>
 
-        {/* Next reservation (only when one is upcoming) */}
-        {nextReservation ? (
-          <Pressable
-            onPress={() => navigation.navigate('Reservations')}
-            style={({ pressed }) => ({
-              marginTop: 16,
-              marginHorizontal: 16,
-              padding: 16,
-              borderRadius: 20,
-              backgroundColor: reservationStatus(nextReservation) === 'ready' ? C.orange : C.green,
-              overflow: 'hidden',
-              opacity: pressed ? 0.9 : 1,
-            })}
-          >
-            <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.15)' }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <Text style={{ fontSize: 28 }}>🕒</Text>
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={{ fontSize: 10, letterSpacing: 2, color: C.lime, fontWeight: '700' }}>
-                  {reservationStatus(nextReservation) === 'ready' ? '● DISPO MAINTENANT' : 'PROCHAINE RÉSA'}
-                </Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: C.beige, marginTop: 3 }} numberOfLines={1}>
-                  {formatPickupTime(nextReservation.pickupTimestamp)}
-                </Text>
-                <Text style={{ fontSize: 11, color: C.lime, opacity: 0.85, marginTop: 2 }} numberOfLines={1}>
-                  {nextReservation.fridgeName} · {nextReservation.items.length} article
-                  {nextReservation.items.length > 1 ? 's' : ''} ·{' '}
-                  {reservationStatus(nextReservation) === 'pending'
-                    ? countdownLabel(nextReservation.pickupTimestamp)
-                    : 'à récupérer'}
-                </Text>
-              </View>
-              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(252,233,218,0.18)', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: C.beige, fontWeight: '700', fontSize: 18 }}>→</Text>
-              </View>
-            </View>
-          </Pressable>
-        ) : null}
-
         {/* Coach Natty */}
         <FadeInView delay={350}>
           <CoachCard />
@@ -504,7 +553,7 @@ export default function Dashboard() {
             <Text style={{ fontSize: 34 }}>🍽️</Text>
             <Text style={{ fontSize: 13, fontWeight: '700', color: C.dark }}>Ton journal est vide</Text>
             <Text style={{ fontSize: 11, color: C.darkSoft, textAlign: 'center', lineHeight: 16 }}>
-              Scanne ton premier repas ou commande dans un Smart Fridge — tout apparaîtra ici.
+              Scanne ton premier repas ou commande dans un frigo Natty — tout apparaîtra ici.
             </Text>
             <View style={{ marginTop: 6, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: C.orange }}>
               <Text style={{ color: C.beige, fontWeight: '700', fontSize: 12 }}>Scanner un repas</Text>

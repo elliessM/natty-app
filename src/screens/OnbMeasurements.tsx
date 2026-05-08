@@ -10,6 +10,11 @@ import { btnDark, btnDarkLabel } from '../shared/Buttons';
 import { useUserStore } from '../store/useUserStore';
 import { hapticSelection } from '../shared/haptics';
 import type { OnboardingStackParamList } from '../navigation/types';
+import type { Goal } from '../types';
+
+// Pour ces objectifs, le poids cible n'a pas de sens : on cible une hygiène
+// de vie, pas un nombre sur la balance.
+const GOALS_WITHOUT_TARGET: Goal[] = ['energy', 'perf'];
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Measurements'>;
 
@@ -17,6 +22,7 @@ export default function OnbMeasurements() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
 
+  const goal = useUserStore((s) => s.goal);
   const heightCm = useUserStore((s) => s.heightCm);
   const weightKg = useUserStore((s) => s.weightKg);
   const targetWeightKg = useUserStore((s) => s.targetWeightKg);
@@ -24,6 +30,7 @@ export default function OnbMeasurements() {
   const setWeightKg = useUserStore((s) => s.setWeightKg);
   const setTargetWeightKg = useUserStore((s) => s.setTargetWeightKg);
   const addWeightEntry = useUserStore((s) => s.addWeightEntry);
+  const showTarget = !GOALS_WITHOUT_TARGET.includes(goal);
 
   const isPristine = heightCm === 178 && weightKg === 75 && targetWeightKg === 72;
   const [h, setH] = useState(isPristine ? '' : String(heightCm));
@@ -36,12 +43,13 @@ export default function OnbMeasurements() {
   const hValid = Number.isFinite(hN) && hN >= 120 && hN <= 230;
   const wValid = Number.isFinite(wN) && wN >= 30 && wN <= 200;
   const twValid = Number.isFinite(twN) && twN >= 30 && twN <= 200;
-  const canContinue = hValid && wValid && twValid;
+  const canContinue = hValid && wValid && (!showTarget || twValid);
 
   const continueNext = () => {
     setHeightCm(hN);
     setWeightKg(Math.round(wN));
-    setTargetWeightKg(Math.round(twN));
+    // Pour énergie/perf : on aligne target sur weight (= maintien implicite).
+    setTargetWeightKg(showTarget ? Math.round(twN) : Math.round(wN));
     // On amorce l'historique avec ce 1er point — la courbe Stats existera dès J0.
     addWeightEntry(Math.round(wN * 10) / 10);
     navigation.navigate('Activity');
@@ -81,26 +89,50 @@ export default function OnbMeasurements() {
           />
         </View>
 
-        {/* Poids cible */}
-        <View style={{ marginTop: 16 }}>
-          <Text style={labelStyle}>POIDS CIBLE</Text>
-          <FieldRow
-            value={tw}
-            onChange={(v) => setTw(v.replace(/[^0-9.,]/g, ''))}
-            unit="kg"
-            maxLength={5}
-            decimal
-          />
-          {wValid && twValid ? (
-            <Text style={{ fontSize: 11, color: C.green, marginTop: 8 }}>
-              {twN < wN
-                ? `Objectif perte de ${(wN - twN).toFixed(1)} kg`
-                : twN > wN
-                ? `Objectif prise de ${(twN - wN).toFixed(1)} kg`
-                : 'Maintien du poids actuel'}
-            </Text>
-          ) : null}
-        </View>
+        {/* Poids cible — uniquement pour les objectifs orientés balance */}
+        {showTarget ? (
+          <View style={{ marginTop: 16 }}>
+            <Text style={labelStyle}>POIDS CIBLE</Text>
+            <FieldRow
+              value={tw}
+              onChange={(v) => setTw(v.replace(/[^0-9.,]/g, ''))}
+              unit="kg"
+              maxLength={5}
+              decimal
+            />
+            {wValid && twValid ? (
+              <Text style={{ fontSize: 11, color: C.green, marginTop: 8 }}>
+                {twN < wN
+                  ? `Objectif perte de ${(wN - twN).toFixed(1)} kg`
+                  : twN > wN
+                  ? `Objectif prise de ${(twN - wN).toFixed(1)} kg`
+                  : 'Maintien du poids actuel'}
+              </Text>
+            ) : null}
+          </View>
+        ) : (
+          <View
+            style={{
+              marginTop: 16,
+              padding: 14,
+              borderRadius: 14,
+              backgroundColor: 'rgba(0,65,47,0.06)',
+              borderWidth: 1,
+              borderColor: 'rgba(0,65,47,0.1)',
+              flexDirection: 'row',
+              gap: 10,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Text style={{ fontSize: 22 }}>🌿</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 11, letterSpacing: 1.5, color: C.green, fontWeight: '700' }}>HYGIÈNE DE VIE</Text>
+              <Text style={{ fontSize: 12, color: C.darkSoft, marginTop: 4, lineHeight: 17 }}>
+                Pas d'objectif balance pour toi — on optimise plutôt énergie, performance et habitudes au quotidien.
+              </Text>
+            </View>
+          </View>
+        )}
 
         <View style={{ flex: 1, minHeight: 40 }} />
 
@@ -138,6 +170,7 @@ function FieldRow({
         borderRadius: 14,
         paddingHorizontal: 14,
         paddingVertical: 12,
+        gap: 6,
       }}
     >
       <TextInput
@@ -155,9 +188,23 @@ function FieldRow({
           fontWeight: '700',
           color: C.dark,
           padding: 0,
+          lineHeight: 22,
+          includeFontPadding: false,
+          textAlignVertical: 'center',
         }}
       />
-      <Text style={{ fontSize: 13, color: C.darkSoft, fontWeight: '600' }}>{unit}</Text>
+      <Text
+        style={{
+          fontSize: 14,
+          color: C.darkSoft,
+          fontWeight: '600',
+          lineHeight: 22,
+          includeFontPadding: false,
+          textAlignVertical: 'center',
+        }}
+      >
+        {unit}
+      </Text>
     </View>
   );
 }

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -27,6 +27,8 @@ export default function ScannerResult() {
 
   const [saved, setSaved] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [nameDraft, setNameDraft] = useState(r.food);
+  useEffect(() => setNameDraft(r.food), [r.food]);
 
   const r: ScanCandidate =
     selected ??
@@ -45,7 +47,7 @@ export default function ScannerResult() {
     addEntry({
       source: 'scan',
       timestamp: Date.now(),
-      food: r.food,
+      food: nameDraft.trim() || r.food,
       emoji: r.emoji,
       kcal: r.kcal,
       prot: r.prot,
@@ -147,7 +149,7 @@ export default function ScannerResult() {
           }}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 11, letterSpacing: 3, color: C.orange, fontWeight: '700' }}>IDENTIFIÉ</Text>
+            <Text style={{ fontSize: 11, letterSpacing: 3, color: C.orange, fontWeight: '700' }}>IDENTIFIÉ · MODIFIABLE</Text>
             <Pressable
               onPress={() => {
                 hapticLight();
@@ -156,12 +158,33 @@ export default function ScannerResult() {
               hitSlop={8}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
             >
-              <Text style={{ fontSize: 12 }}>✏️</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: C.green }}>Modifier</Text>
+              <Text style={{ fontSize: 12 }}>⚖️</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: C.green }}>Quantité</Text>
             </Pressable>
           </View>
-          <Text style={{ fontFamily: F.display, fontSize: 24, fontWeight: '900', color: C.dark, marginTop: 6, lineHeight: 28 }}>
-            {r.food}
+          {/* Nom éditable directement (tap pour modifier) */}
+          <TextInput
+            value={nameDraft}
+            onChangeText={setNameDraft}
+            multiline
+            maxLength={80}
+            placeholder="Décris ton plat…"
+            placeholderTextColor={C.darkSoft}
+            style={{
+              fontFamily: F.display,
+              fontSize: 24,
+              fontWeight: '900',
+              color: C.dark,
+              marginTop: 6,
+              lineHeight: 28,
+              padding: 0,
+              minHeight: 30,
+            }}
+            returnKeyType="done"
+            blurOnSubmit
+          />
+          <Text style={{ fontSize: 10, color: C.darkSoft, marginTop: 2 }}>
+            ✏️ Tape sur le nom pour le corriger
           </Text>
           <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
             <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 12, backgroundColor: C.lime }}>

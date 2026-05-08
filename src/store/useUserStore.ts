@@ -60,6 +60,7 @@ type UserState = {
   setActivityLevel: (v: ActivityLevel) => void;
   setHasOnboarded: (v: boolean) => void;
   addHydration: (ml?: number) => void;
+  removeHydration: (ml?: number) => void;
   resetHydrationIfNewDay: () => void;
   setNotificationsEnabled: (v: boolean) => void;
   setNotifPref: (key: 'hydration' | 'meals' | 'weighIn' | 'reservations', value: boolean) => void;
@@ -130,6 +131,13 @@ export const useUserStore = create<UserState>()(
         set((s) => ({
           hydrationDay: day,
           hydrationMl: (s.hydrationDay === day ? s.hydrationMl : 0) + ml,
+        }));
+      },
+      removeHydration: (ml = HYDRATION_STEP_ML) => {
+        const day = todayKey();
+        set((s) => ({
+          hydrationDay: day,
+          hydrationMl: Math.max(0, (s.hydrationDay === day ? s.hydrationMl : 0) - ml),
         }));
       },
       resetHydrationIfNewDay: () => {
