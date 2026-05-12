@@ -58,9 +58,9 @@ function ProfileStackScreen() {
 
 const ScanDummy = () => null;
 
+// On laisse react-navigation calculer la hauteur native (49 + safe area bottom),
+// sinon iOS double-compte le safe area et la tab bar paraît énorme.
 const TAB_BAR_STYLE = {
-  height: 84,
-  paddingTop: 10,
   backgroundColor: C.white,
   borderTopWidth: 1,
   borderTopColor: C.beige2,

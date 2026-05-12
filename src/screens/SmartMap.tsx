@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Pressable, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, Pressable, ScrollView, Animated, Easing, PanResponder } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -77,20 +77,64 @@ export default function SmartMap() {
   const filtersTop = searchTop + 62;
   const { coords, granted } = useLocation();
 
-  // Bottom sheet : 2 positions (collapsed / expanded), tap sur handle pour toggle.
+  // Bottom sheet draggable : 2 snap points (replié / déployé) + drag fluide.
   const COLLAPSED_TOP = 506;
   const EXPANDED_TOP = filtersTop + 60;
-  const [expanded, setExpanded] = useState(false);
   const sheetTop = useRef(new Animated.Value(COLLAPSED_TOP)).current;
+  const currentTopRef = useRef(COLLAPSED_TOP);
 
   useEffect(() => {
-    Animated.timing(sheetTop, {
-      toValue: expanded ? EXPANDED_TOP : COLLAPSED_TOP,
-      duration: 280,
-      easing: Easing.bezier(0.2, 0.7, 0.3, 1),
+    const id = sheetTop.addListener(({ value }) => {
+      currentTopRef.current = value;
+    });
+    return () => sheetTop.removeListener(id);
+  }, [sheetTop]);
+
+  const snapTo = (target: number) => {
+    Animated.spring(sheetTop, {
+      toValue: target,
       useNativeDriver: false,
+      tension: 80,
+      friction: 14,
     }).start();
-  }, [expanded]);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 3,
+      onPanResponderGrant: () => {
+        sheetTop.stopAnimation();
+        // Capture la valeur actuelle comme offset pour pouvoir suivre le doigt.
+        sheetTop.extractOffset();
+      },
+      onPanResponderMove: (_, g) => {
+        // Borne le drag entre EXPANDED_TOP et COLLAPSED_TOP
+        const start = currentTopRef.current;
+        const dy = g.dy;
+        const next = Math.max(EXPANDED_TOP, Math.min(COLLAPSED_TOP, start + dy));
+        sheetTop.setValue(next - start);
+      },
+      onPanResponderRelease: (_, g) => {
+        sheetTop.flattenOffset();
+        const finalTop = currentTopRef.current;
+        const distExp = Math.abs(finalTop - EXPANDED_TOP);
+        const distCol = Math.abs(finalTop - COLLAPSED_TOP);
+        // Snap à la position la plus proche, biais vélocité (geste rapide).
+        const target =
+          g.vy < -0.5 ? EXPANDED_TOP : g.vy > 0.5 ? COLLAPSED_TOP : distExp < distCol ? EXPANDED_TOP : COLLAPSED_TOP;
+        snapTo(target);
+      },
+      onPanResponderTerminate: () => {
+        sheetTop.flattenOffset();
+        snapTo(COLLAPSED_TOP);
+      },
+    })
+  ).current;
+
+  const togglePosition = () => {
+    snapTo(currentTopRef.current > (EXPANDED_TOP + COLLAPSED_TOP) / 2 ? EXPANDED_TOP : COLLAPSED_TOP);
+  };
 
   const sortedFridges = useMemo(() => {
     return FRIDGES.map((f) => {
@@ -273,14 +317,17 @@ export default function SmartMap() {
           elevation: 6,
         }}
       >
-        <Pressable
-          onPress={() => setExpanded((v) => !v)}
-          accessibilityLabel={expanded ? 'Réduire la liste' : 'Agrandir la liste'}
-          hitSlop={10}
-          style={{ paddingVertical: 8, alignItems: 'center' }}
-        >
-          <View style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: '#cfc7bd' }} />
-        </Pressable>
+        {/* Zone de drag — la handle + son enveloppe captent le pan */}
+        <View {...panResponder.panHandlers}>
+          <Pressable
+            onPress={togglePosition}
+            accessibilityLabel="Agrandir ou réduire la liste"
+            hitSlop={10}
+            style={{ paddingVertical: 10, alignItems: 'center' }}
+          >
+            <View style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: '#cfc7bd' }} />
+          </Pressable>
+        </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6, paddingHorizontal: 20, paddingBottom: 4 }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: C.dark }}>Frigos Natty proches</Text>
           <Text style={{ fontSize: 10, color: C.green, fontWeight: '500' }}>

@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { Archivo_900Black } from '@expo-google-fonts/archivo';
 
 import RootNavigator from './src/navigation/RootNavigator';
 import { C } from './src/tokens';
@@ -28,7 +29,11 @@ export default function App() {
     (async () => {
       try {
         await Font.loadAsync({
-          Obviously: require('./assets/fonts/ObviouslyDemo-Black.otf'),
+          // Archivo Black : gratuit, glyphes FR complets, style heavy display.
+          // Remplace ObviouslyDemo qui n'avait que l'ASCII (pas les accents).
+          Archivo_900Black,
+          // Alias 'Obviously' pour éviter de toucher tous les fontFamily du code.
+          Obviously: Archivo_900Black,
         });
       } catch {
         /* fonts optional — system fallback */
