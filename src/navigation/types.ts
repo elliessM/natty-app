@@ -40,7 +40,7 @@ export type MapStackParamList = {
   SmartMap: undefined;
   AchatS1: undefined;
   AchatS2: undefined;
-  AchatS3: undefined;
+  AchatS3: { pickupAt?: number } | undefined;
   AchatS4: undefined;
   AchatS5: undefined;
 };

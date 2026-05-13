@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { C, F, softShadow, cardShadow } from '../tokens';
 import StatusBar from '../shared/StatusBar';
-import { IconBack, IconPin, IconCheck } from '../shared/Icons';
+import { IconBack, IconPin } from '../shared/Icons';
 import { formatPrice } from '../data/products';
 import { PRODUCT_IMAGES } from '../data/images';
 import SmartImage from '../shared/SmartImage';
 import { useCartStore } from '../store/useCartStore';
 import { PRODUCTS } from '../data/products';
-import { useReservationsStore, type PaymentTiming } from '../store/useReservationsStore';
-import { FRIDGES } from '../data/fridges';
-import { hapticSelection, hapticSuccess } from '../shared/haptics';
 import type { MapStackParamList } from '../navigation/types';
 import type { CartItem } from '../types';
 
@@ -26,9 +23,6 @@ export default function AchatS2() {
   const items = useCartStore((s) => s.items);
   const incrementItem = useCartStore((s) => s.incrementItem);
   const decrementItem = useCartStore((s) => s.decrementItem);
-  const clearCart = useCartStore((s) => s.clear);
-  const createReservation = useReservationsStore((s) => s.createReservation);
-  const [paymentTiming, setPaymentTiming] = useState<PaymentTiming>('now');
 
   // Demo fallback if cart empty (e.g. jumped directly to S2 via nav chips)
   const display: CartItem[] =
@@ -156,27 +150,6 @@ export default function AchatS2() {
           </View>
         </View>
 
-        {/* Choix paiement now vs pickup */}
-        <Text style={{ paddingHorizontal: 20, marginTop: 30, fontSize: 13, fontWeight: '700', color: C.green }}>Quand veux-tu payer ?</Text>
-        <View style={{ paddingHorizontal: 16, marginTop: 12, gap: 10 }}>
-          <PaymentTimingCard
-            active={paymentTiming === 'now'}
-            onPress={() => { hapticSelection(); setPaymentTiming('now'); }}
-            emoji="⚡"
-            title="Payer maintenant"
-            sub="Le frigo s'ouvre automatiquement à l'arrivée."
-            badge="RAPIDE"
-          />
-          <PaymentTimingCard
-            active={paymentTiming === 'pickup'}
-            onPress={() => { hapticSelection(); setPaymentTiming('pickup'); }}
-            emoji="⏰"
-            title="Réserver, payer plus tard"
-            sub="Tu bloques les produits, paiement à finaliser dans l'app avant retrait."
-            badge="DIFFÉRÉ"
-          />
-        </View>
-
         <Text style={{ paddingHorizontal: 20, marginTop: 30, fontSize: 13, fontWeight: '700', color: C.green }}>Détail paiement</Text>
         <View style={{ marginHorizontal: 16, marginTop: 12, backgroundColor: C.white, borderRadius: 20, padding: 16, paddingHorizontal: 20, ...cardShadow }}>
           {[
@@ -218,26 +191,7 @@ export default function AchatS2() {
         }}
       >
         <Pressable
-          onPress={() => {
-            if (paymentTiming === 'now') {
-              navigation.navigate('AchatS3');
-            } else {
-              // Pickup → réserve directement, paiement plus tard au frigo
-              const fridge = FRIDGES.find((f) => f.open) ?? FRIDGES[0];
-              createReservation({
-                items: [...items],
-                fridgeId: fridge.id,
-                fridgeName: fridge.name,
-                fridgeAddr: fridge.addr,
-                pickupTimestamp: Date.now() + 30 * 60 * 1000,
-                total,
-                paymentTiming: 'pickup',
-              });
-              hapticSuccess();
-              clearCart();
-              navigation.navigate('AchatS5');
-            }
-          }}
+          onPress={() => navigation.navigate('AchatS3')}
           style={{
             width: '100%',
             height: 60,
@@ -252,95 +206,10 @@ export default function AchatS2() {
             elevation: 6,
           }}
         >
-          <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>
-            {paymentTiming === 'now'
-              ? `Payer · ${formatPrice(total)} EUR →`
-              : `Réserver · à régler au retrait →`}
-          </Text>
+          <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>Payer · {formatPrice(total)} EUR →</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-function PaymentTimingCard({
-  active,
-  onPress,
-  emoji,
-  title,
-  sub,
-  badge,
-}: {
-  active: boolean;
-  onPress: () => void;
-  emoji: string;
-  title: string;
-  sub: string;
-  badge: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
-        paddingVertical: 14,
-        paddingHorizontal: 14,
-        borderRadius: 18,
-        backgroundColor: active ? C.green : C.white,
-        borderWidth: active ? 0 : 1.5,
-        borderColor: 'rgba(0,65,47,0.15)',
-      }}
-    >
-      <View
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 14,
-          backgroundColor: active ? 'rgba(252,233,218,0.18)' : C.beige,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text style={{ fontSize: 22 }}>{emoji}</Text>
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: active ? C.beige : C.dark }}>
-            {title}
-          </Text>
-          <View
-            style={{
-              paddingVertical: 2,
-              paddingHorizontal: 6,
-              borderRadius: 6,
-              backgroundColor: active ? C.orange : 'rgba(237,126,0,0.15)',
-            }}
-          >
-            <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.8, color: active ? C.beige : C.orange }}>
-              {badge}
-            </Text>
-          </View>
-        </View>
-        <Text style={{ fontSize: 11, color: active ? C.lime : C.darkSoft, opacity: 0.85, marginTop: 3, lineHeight: 15 }}>
-          {sub}
-        </Text>
-      </View>
-      {active ? (
-        <View
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            backgroundColor: C.orange,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <IconCheck size={12} />
-        </View>
-      ) : null}
-    </Pressable>
-  );
-}

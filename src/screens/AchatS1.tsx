@@ -10,7 +10,6 @@ import { PRODUCTS, formatPrice } from '../data/products';
 import { PRODUCT_IMAGES } from '../data/images';
 import SmartImage from '../shared/SmartImage';
 import { useCartStore } from '../store/useCartStore';
-import { useReservationsStore } from '../store/useReservationsStore';
 import { FRIDGES } from '../data/fridges';
 import { hapticLight, hapticMedium, hapticSuccess } from '../shared/haptics';
 import TimeSlotPickerModal from '../shared/TimeSlotPickerModal';
@@ -38,28 +37,17 @@ export default function AchatS1() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const items = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
-  const clearCart = useCartStore((s) => s.clear);
   const subtotal = useCartStore((s) => s.subtotal());
-  const createReservation = useReservationsStore((s) => s.createReservation);
 
   // Frigo courant : le premier ouvert (quand la vraie nav transmettra l'id on le remplacera).
   const currentFridge = FRIDGES.find((f) => f.open) ?? FRIDGES[0];
 
+  // Programmer un créneau : on passe par le paiement avant création de la résa.
+  // Pas de "payer plus tard" possible — la commande n'est réservée qu'une fois payée.
   const handleReserve = (pickupTs: number) => {
-    const total = items.reduce((s, c) => s + c.price * c.qty, 0) * 0.95 + 0.3;
-    createReservation({
-      items: [...items],
-      fridgeId: currentFridge.id,
-      fridgeName: currentFridge.name,
-      fridgeAddr: currentFridge.addr,
-      pickupTimestamp: pickupTs,
-      total,
-      paymentTiming: 'pickup',
-    });
     hapticSuccess();
-    clearCart();
     setPickerOpen(false);
-    navigation.getParent()?.navigate('HomeTab', { screen: 'Reservations' });
+    navigation.navigate('AchatS3', { pickupAt: pickupTs });
   };
 
   const targetCat = FILTER_TO_CAT[filter as FilterId] ?? null;

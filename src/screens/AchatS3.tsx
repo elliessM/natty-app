@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,7 +11,9 @@ import HomeIndicator from '../shared/HomeIndicator';
 import { IconBack, IconCheck } from '../shared/Icons';
 import { formatPrice, PRODUCTS } from '../data/products';
 import { useCartStore } from '../store/useCartStore';
-import { hapticMedium, hapticSelection } from '../shared/haptics';
+import { useReservationsStore } from '../store/useReservationsStore';
+import { FRIDGES } from '../data/fridges';
+import { hapticMedium, hapticSelection, hapticSuccess } from '../shared/haptics';
 import type { MapStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<MapStackParamList, 'AchatS3'>;
@@ -23,12 +26,15 @@ const METHODS = [
 
 export default function AchatS3() {
   const navigation = useNavigation<Nav>();
+  const route = useRoute<RouteProp<MapStackParamList, 'AchatS3'>>();
   const insets = useSafeAreaInsets();
   const backTop = insets.top + 8;
   const [mode, setMode] = useState('applepay');
   const [loading, setLoading] = useState(false);
 
   const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clear);
+  const createReservation = useReservationsStore((s) => s.createReservation);
   const display = items.length > 0
     ? items
     : [
@@ -37,11 +43,34 @@ export default function AchatS3() {
       ];
 
   const total = display.reduce((s, c) => s + c.price * c.qty, 0) * 0.95 + 0.3;
+  const pickupAt = route.params?.pickupAt;
+  const isScheduled = !!pickupAt;
 
   const pay = () => {
     hapticMedium();
     setLoading(true);
-    setTimeout(() => navigation.navigate('AchatS4'), 1400);
+    setTimeout(() => {
+      if (isScheduled && pickupAt) {
+        // Flow programmé : on crée la résa payée maintenant, on revient au tracking
+        const fridge = FRIDGES.find((f) => f.open) ?? FRIDGES[0];
+        const id = createReservation({
+          items: [...items],
+          fridgeId: fridge.id,
+          fridgeName: fridge.name,
+          fridgeAddr: fridge.addr,
+          pickupTimestamp: pickupAt,
+          total,
+          paymentTiming: 'now',
+          paidAt: Date.now(),
+        });
+        hapticSuccess();
+        clearCart();
+        navigation.getParent()?.navigate('HomeTab', { screen: 'OrderTracking', params: { id } });
+      } else {
+        // Flow immédiat (au frigo) : BLE approche puis unlock
+        navigation.navigate('AchatS4');
+      }
+    }, 1400);
   };
 
   return (
@@ -84,7 +113,10 @@ export default function AchatS3() {
           <Text style={{ fontFamily: F.display, fontSize: 56, fontWeight: '900', color: C.beige, letterSpacing: -1 }}>{formatPrice(total)}</Text>
           <Text style={{ fontSize: 20, marginLeft: 6, color: C.beige, opacity: 0.7 }}>EUR</Text>
         </View>
-        <Text style={{ fontSize: 12, color: C.lime, opacity: 0.8, marginTop: 2 }}>{display.length} article{display.length > 1 ? 's' : ''} · Club −5%</Text>
+        <Text style={{ fontSize: 12, color: C.lime, opacity: 0.8, marginTop: 2 }}>
+          {display.length} article{display.length > 1 ? 's' : ''} · Club −5%
+          {isScheduled ? ' · Retrait programmé' : ''}
+        </Text>
       </LinearGradient>
 
       <Text style={{ position: 'absolute', left: 20, top: backTop + 280, fontSize: 13, fontWeight: '700', color: C.green }}>Méthode de paiement</Text>
@@ -132,7 +164,9 @@ export default function AchatS3() {
           <Text style={{ fontSize: 16 }}>🔒</Text>
         </View>
         <Text style={{ flex: 1, fontSize: 11, color: C.darkSoft, lineHeight: 16 }}>
-          Paiement sécurisé · Le frigo s'ouvrira automatiquement à l'arrivée via BLE.
+          {isScheduled
+            ? "Paiement sécurisé · La commande sera bloquée pour ton créneau, retrait via BLE."
+            : "Paiement sécurisé · Le frigo s'ouvrira automatiquement à l'arrivée via BLE."}
         </Text>
       </View>
 
