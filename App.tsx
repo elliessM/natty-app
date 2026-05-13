@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { Archivo_900Black } from '@expo-google-fonts/archivo';
+import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
 
 import RootNavigator from './src/navigation/RootNavigator';
 import { C } from './src/tokens';
@@ -29,11 +30,16 @@ export default function App() {
     (async () => {
       try {
         await Font.loadAsync({
-          // Archivo Black : gratuit, glyphes FR complets, style heavy display.
-          // Remplace ObviouslyDemo qui n'avait que l'ASCII (pas les accents).
+          // Display heavy (anciennement Obviously qui n'avait pas les accents)
           Archivo_900Black,
-          // Alias 'Obviously' pour éviter de toucher tous les fontFamily du code.
           Obviously: Archivo_900Black,
+          // Body sans-serif moderne, charge en 4 poids pour Text + TextInput
+          Manrope_400Regular,
+          Manrope_500Medium,
+          Manrope_600SemiBold,
+          Manrope_700Bold,
+          // Alias 'Manrope' pour éviter de toucher tous les fontFamily du code
+          Manrope: Manrope_400Regular,
         });
       } catch {
         /* fonts optional — system fallback */

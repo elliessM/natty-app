@@ -22,8 +22,7 @@ export type MainTabsParamList = {
   HomeTab: undefined;
   MapTab: undefined;
   ScanTab: undefined;
-  ClubTab: undefined;
-  ProfileTab: undefined;
+  SportTab: undefined;
 };
 
 export type HomeStackParamList = {
@@ -31,6 +30,10 @@ export type HomeStackParamList = {
   Journal: { dayKey?: string } | undefined;
   Reservations: undefined;
   Stats: undefined;
+  Profile: undefined;
+  Social: undefined;
+  Fasting: undefined;
+  OrderTracking: { id: string };
 };
 
 export type MapStackParamList = {
@@ -47,12 +50,8 @@ export type ScannerStackParamList = {
   ScannerResult: undefined;
 };
 
-export type ClubStackParamList = {
-  Social: undefined;
-};
-
-export type ProfileStackParamList = {
-  ProfileHome: undefined;
+export type SportStackParamList = {
+  SportHome: undefined;
 };
 
 // Screen prop helpers (import as needed in each screen)
@@ -69,7 +68,7 @@ export type HomeScreenProps<T extends keyof HomeStackParamList> = CompositeScree
   NativeStackScreenProps<HomeStackParamList, T>,
   BottomTabScreenProps<MainTabsParamList>
 >;
-export type ClubScreenProps<T extends keyof ClubStackParamList> = CompositeScreenProps<
-  NativeStackScreenProps<ClubStackParamList, T>,
+export type SportScreenProps<T extends keyof SportStackParamList> = CompositeScreenProps<
+  NativeStackScreenProps<SportStackParamList, T>,
   BottomTabScreenProps<MainTabsParamList>
 >;

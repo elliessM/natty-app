@@ -341,7 +341,7 @@ export default function Profile() {
         <Pressable
           onPress={() => {
             hapticLight();
-            navigation.getParent?.()?.navigate('HomeTab', { screen: 'Stats' });
+            navigation.navigate('Stats');
           }}
           style={({ pressed }) => ({
             marginHorizontal: 16,
@@ -944,7 +944,7 @@ function MetricInput({
   onBlur: () => void;
 }) {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, minWidth: 0 }}>
       <Text style={fieldLabelStyle}>{label}</Text>
       <View
         style={{
@@ -955,6 +955,7 @@ function MetricInput({
           paddingHorizontal: 12,
           paddingVertical: 10,
           marginTop: 6,
+          gap: 4,
         }}
       >
         <TextInput
@@ -963,10 +964,33 @@ function MetricInput({
           onBlur={onBlur}
           keyboardType="number-pad"
           maxLength={3}
-          style={{ flex: 1, fontSize: 18, fontWeight: '700', color: C.dark, fontFamily: F.body, padding: 0 }}
+          numberOfLines={1}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: 16,
+            color: C.dark,
+            fontFamily: F.bodyBold,
+            padding: 0,
+            lineHeight: 20,
+            includeFontPadding: false,
+            textAlignVertical: 'center',
+          }}
           returnKeyType="done"
         />
-        <Text style={{ fontSize: 12, color: C.darkSoft, fontWeight: '500', marginLeft: 4 }}>{unit}</Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: C.darkSoft,
+            fontFamily: F.bodyMedium,
+            lineHeight: 20,
+            includeFontPadding: false,
+            textAlignVertical: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {unit}
+        </Text>
       </View>
     </View>
   );

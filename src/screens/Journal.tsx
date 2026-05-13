@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import FoodSearchModal from './FoodSearchModal';
 import { View, Text, Pressable, ScrollView, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -52,7 +51,6 @@ export default function Journal() {
   );
 
   const [selectedDay, setSelectedDay] = useState<string>(route.params?.dayKey ?? dayKey(Date.now()));
-  const [searchOpen, setSearchOpen] = useState(false);
   const isToday = selectedDay === dayKey(Date.now());
   const isPast = new Date(selectedDay) < new Date(dayKey(Date.now()));
 
@@ -214,29 +212,18 @@ export default function Journal() {
               {isPast ? 'Pas de repas ce jour-là' : 'Rien enregistré pour le moment'}
             </Text>
             <Text style={{ fontSize: 12, color: C.darkSoft, textAlign: 'center', lineHeight: 18, maxWidth: 280 }}>
-              Cherche un aliment, scanne un code-barres ou prends une photo de ton plat.
+              Utilise l'onglet Scan pour ajouter un plat — photo IA, code-barres ou saisie manuelle.
             </Text>
             {isToday ? (
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
-                <Pressable
-                  onPress={() => {
-                    hapticLight();
-                    setSearchOpen(true);
-                  }}
-                  style={{ paddingVertical: 10, paddingHorizontal: 18, borderRadius: 999, backgroundColor: C.orange }}
-                >
-                  <Text style={{ color: C.beige, fontWeight: '700', fontSize: 13 }}>+ Ajouter un repas</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    hapticLight();
-                    navigation.getParent()?.getParent()?.navigate('ScannerModal');
-                  }}
-                  style={{ paddingVertical: 10, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}
-                >
-                  <Text style={{ color: C.green, fontWeight: '700', fontSize: 13 }}>📷 Photo</Text>
-                </Pressable>
-              </View>
+              <Pressable
+                onPress={() => {
+                  hapticLight();
+                  navigation.getParent()?.getParent()?.navigate('ScannerModal');
+                }}
+                style={{ marginTop: 6, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 999, backgroundColor: C.orange }}
+              >
+                <Text style={{ color: C.beige, fontWeight: '700', fontSize: 13 }}>📷 Ouvrir le scanner</Text>
+              </Pressable>
             ) : null}
           </View>
         ) : (
@@ -329,38 +316,6 @@ export default function Journal() {
           </View>
         )}
       </ScrollView>
-
-      {/* FAB */}
-      {isToday ? (
-        <Pressable
-          onPress={() => {
-            hapticLight();
-            setSearchOpen(true);
-          }}
-          accessibilityLabel="Ajouter un repas"
-          style={({ pressed }) => ({
-            position: 'absolute',
-            right: 20,
-            bottom: insets.bottom + 24,
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: C.orange,
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: C.orange,
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.45,
-            shadowRadius: 20,
-            elevation: 10,
-            transform: [{ scale: pressed ? 0.95 : 1 }],
-          })}
-        >
-          <Text style={{ color: C.beige, fontSize: 28, fontWeight: '700', lineHeight: 30, marginTop: -2 }}>+</Text>
-        </Pressable>
-      ) : null}
-
-      <FoodSearchModal visible={searchOpen} onClose={() => setSearchOpen(false)} source="manual" />
     </View>
   );
 }

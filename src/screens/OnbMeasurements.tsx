@@ -181,11 +181,12 @@ function FieldRow({
         keyboardType={decimal ? 'decimal-pad' : 'number-pad'}
         maxLength={maxLength}
         returnKeyType="next"
+        numberOfLines={1}
         style={{
           flex: 1,
-          fontFamily: F.body,
-          fontSize: 18,
-          fontWeight: '700',
+          minWidth: 0,
+          fontFamily: F.bodyBold,
+          fontSize: 17,
           color: C.dark,
           padding: 0,
           lineHeight: 22,
@@ -195,12 +196,13 @@ function FieldRow({
       />
       <Text
         style={{
-          fontSize: 14,
+          fontSize: 13,
           color: C.darkSoft,
-          fontWeight: '600',
+          fontFamily: F.bodyMedium,
           lineHeight: 22,
           includeFontPadding: false,
           textAlignVertical: 'center',
+          flexShrink: 0,
         }}
       >
         {unit}

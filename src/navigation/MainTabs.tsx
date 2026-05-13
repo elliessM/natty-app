@@ -9,8 +9,7 @@ import { C } from '../tokens';
 import type {
   MainTabsParamList,
   HomeStackParamList,
-  ClubStackParamList,
-  ProfileStackParamList,
+  SportStackParamList,
 } from './types';
 
 import Dashboard from '../screens/Dashboard';
@@ -19,15 +18,17 @@ import Reservations from '../screens/Reservations';
 import Stats from '../screens/Stats';
 import Social from '../screens/Social';
 import ProfileStub from '../screens/ProfileStub';
+import Sport from '../screens/Sport';
+import Fasting from '../screens/Fasting';
+import OrderTracking from '../screens/OrderTracking';
 import MapStack from './MapStack';
-import { IconHome, IconMap, IconTrophy, IconUser, IconCamera } from '../shared/Icons';
+import { IconHome, IconMap, IconDumbbell, IconCamera } from '../shared/Icons';
 import { hapticMedium } from '../shared/haptics';
 import { useCartStore } from '../store/useCartStore';
 
 const Tabs = createBottomTabNavigator<MainTabsParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
-const ClubStack = createNativeStackNavigator<ClubStackParamList>();
-const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+const SportStack = createNativeStackNavigator<SportStackParamList>();
 
 function HomeStackScreen() {
   return (
@@ -36,23 +37,19 @@ function HomeStackScreen() {
       <HomeStack.Screen name="Journal" component={Journal} />
       <HomeStack.Screen name="Reservations" component={Reservations} />
       <HomeStack.Screen name="Stats" component={Stats} />
+      <HomeStack.Screen name="Profile" component={ProfileStub} />
+      <HomeStack.Screen name="Social" component={Social} />
+      <HomeStack.Screen name="Fasting" component={Fasting} />
+      <HomeStack.Screen name="OrderTracking" component={OrderTracking} />
     </HomeStack.Navigator>
   );
 }
 
-function ClubStackScreen() {
+function SportStackScreen() {
   return (
-    <ClubStack.Navigator screenOptions={{ headerShown: false }}>
-      <ClubStack.Screen name="Social" component={Social} />
-    </ClubStack.Navigator>
-  );
-}
-
-function ProfileStackScreen() {
-  return (
-    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="ProfileHome" component={ProfileStub} />
-    </ProfileStack.Navigator>
+    <SportStack.Navigator screenOptions={{ headerShown: false }}>
+      <SportStack.Screen name="SportHome" component={Sport} />
+    </SportStack.Navigator>
   );
 }
 
@@ -159,19 +156,11 @@ export default function MainTabs() {
         }}
       />
       <Tabs.Screen
-        name="ClubTab"
-        component={ClubStackScreen}
+        name="SportTab"
+        component={SportStackScreen}
         options={{
-          title: 'Club',
-          tabBarIcon: ({ focused }) => <IconTrophy color={focused ? C.green : C.darkSoft} />,
-        }}
-      />
-      <Tabs.Screen
-        name="ProfileTab"
-        component={ProfileStackScreen}
-        options={{
-          title: 'Profil',
-          tabBarIcon: ({ focused }) => <IconUser color={focused ? C.green : C.darkSoft} />,
+          title: 'Sport',
+          tabBarIcon: ({ focused }) => <IconDumbbell color={focused ? C.green : C.darkSoft} />,
         }}
       />
     </Tabs.Navigator>

@@ -113,6 +113,7 @@ function buildReservations() {
       pickupTimestamp: tomorrow.getTime(),
       total: PRODUCTS[0].price + PRODUCTS[1].price * 2,
       createdAt: Date.now() - 3600_000,
+      paymentTiming: 'pickup' as const,
     },
     {
       id: `demo-resa-past-${Date.now()}`,
@@ -124,6 +125,8 @@ function buildReservations() {
       total: PRODUCTS[2].price,
       createdAt: yest.getTime() - 7200_000,
       completedAt: yest.getTime() + 600_000,
+      paymentTiming: 'now' as const,
+      paidAt: yest.getTime() - 7200_000,
     },
   ];
 }

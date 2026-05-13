@@ -16,8 +16,11 @@ export const C = {
 };
 
 export const F = {
-  display: 'Obviously',
-  body: 'Manrope',
+  display: 'Obviously', // aliasé sur Archivo_900Black au runtime
+  body: 'Manrope', // aliasé sur Manrope_400Regular
+  bodyMedium: 'Manrope_500Medium',
+  bodySemi: 'Manrope_600SemiBold',
+  bodyBold: 'Manrope_700Bold',
 };
 
 export const SCREEN_W = 390;

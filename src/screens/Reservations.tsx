@@ -112,7 +112,15 @@ export default function Reservations() {
             <Text style={sectionTitle}>À VENIR</Text>
             <View style={{ marginHorizontal: 16, gap: 10 }}>
               {upcoming.map((r) => (
-                <ReservationCard key={r.id} r={r} onCancel={() => confirmCancel(r)} />
+                <Pressable
+                  key={r.id}
+                  onPress={() => {
+                    hapticLight();
+                    navigation.navigate('OrderTracking', { id: r.id });
+                  }}
+                >
+                  <ReservationCard r={r} onCancel={() => confirmCancel(r)} />
+                </Pressable>
               ))}
             </View>
           </>
@@ -123,7 +131,15 @@ export default function Reservations() {
             <Text style={sectionTitle}>HISTORIQUE</Text>
             <View style={{ marginHorizontal: 16, gap: 10 }}>
               {past.slice(0, 10).map((r) => (
-                <ReservationCard key={r.id} r={r} historical />
+                <Pressable
+                  key={r.id}
+                  onPress={() => {
+                    hapticLight();
+                    navigation.navigate('OrderTracking', { id: r.id });
+                  }}
+                >
+                  <ReservationCard r={r} historical />
+                </Pressable>
               ))}
             </View>
           </>

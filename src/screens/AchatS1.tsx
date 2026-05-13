@@ -54,6 +54,7 @@ export default function AchatS1() {
       fridgeAddr: currentFridge.addr,
       pickupTimestamp: pickupTs,
       total,
+      paymentTiming: 'pickup',
     });
     hapticSuccess();
     clearCart();

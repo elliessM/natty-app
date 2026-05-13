@@ -183,6 +183,74 @@ export async function cancelReservationNotif(reservationId: string) {
   await Notifications.cancelScheduledNotificationAsync(`${TAG_RESERVATION}.${reservationId}.now`).catch(() => {});
 }
 
+// ─── Fasting ────────────────────────────────────────────────────────
+const TAG_FASTING = 'natty.fasting';
+
+export async function scheduleFastingNotifs(opts: {
+  startTs: number;
+  targetFastH: number;
+  notifyEnd: boolean;
+  notifyEatWindowStart: boolean;
+}) {
+  if (IS_WEB) return;
+  await cancelFastingNotifs();
+  const { startTs, targetFastH, notifyEnd, notifyEatWindowStart } = opts;
+  const endTs = startTs + targetFastH * 3_600_000;
+  const now = Date.now();
+
+  if (notifyEnd && endTs > now) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${TAG_FASTING}.end`,
+      content: {
+        title: '🎯 Objectif jeûne atteint',
+        body: `Tu as tenu ${targetFastH} h — fenêtre alimentaire ouverte.`,
+        sound: 'default',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(endTs),
+      } as any,
+    });
+  }
+
+  // Rappel 1h avant fin (motivation)
+  const oneHourBefore = endTs - 60 * 60 * 1000;
+  if (notifyEnd && oneHourBefore > now) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${TAG_FASTING}.almost`,
+      content: {
+        title: '⏰ Plus qu\'1h',
+        body: "Garde le cap — tu y es presque.",
+        sound: 'default',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(oneHourBefore),
+      } as any,
+    });
+  }
+
+  if (notifyEatWindowStart && endTs > now) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: `${TAG_FASTING}.eat`,
+      content: {
+        title: '🍽️ Fenêtre alimentaire',
+        body: 'C\'est le moment de manger — pense à logger ton repas.',
+        sound: 'default',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(endTs + 60_000),
+      } as any,
+    });
+  }
+}
+
+export async function cancelFastingNotifs() {
+  if (IS_WEB) return;
+  await cancelByTag(TAG_FASTING);
+}
+
 // ─── iOS channel (no-op iOS, utile Android) ────────────────────────
 export async function ensureChannelAndroid() {
   if (Platform.OS !== 'android') return;

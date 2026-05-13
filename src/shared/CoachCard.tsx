@@ -91,7 +91,7 @@ export default function CoachCard() {
         navigation.getParent()?.navigate('MapTab', { screen: 'SmartMap' });
         return;
       case 'social':
-        navigation.getParent()?.navigate('ClubTab');
+        navigation.navigate('Social');
         return;
     }
   };

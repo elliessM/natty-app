@@ -5,6 +5,8 @@ import type { CartItem } from '../types';
 
 export type ReservationStatus = 'pending' | 'ready' | 'past' | 'cancelled';
 
+export type PaymentTiming = 'now' | 'pickup';
+
 export type Reservation = {
   id: string;
   items: CartItem[];
@@ -16,6 +18,8 @@ export type Reservation = {
   createdAt: number;
   cancelledAt?: number;
   completedAt?: number;
+  paymentTiming: PaymentTiming;
+  paidAt?: number; // timestamp paiement effectif (immédiat ou différé)
 };
 
 type ReservationsState = {
@@ -23,6 +27,7 @@ type ReservationsState = {
   createReservation: (r: Omit<Reservation, 'id' | 'createdAt'>) => string;
   cancelReservation: (id: string) => void;
   completeReservation: (id: string) => void;
+  markAsPaid: (id: string) => void;
   clearAll: () => void;
 };
 
@@ -44,6 +49,12 @@ export const useReservationsStore = create<ReservationsState>()(
       completeReservation: (id) =>
         set((s) => ({
           reservations: s.reservations.map((r) => (r.id === id ? { ...r, completedAt: Date.now() } : r)),
+        })),
+      markAsPaid: (id) =>
+        set((s) => ({
+          reservations: s.reservations.map((r) =>
+            r.id === id && !r.paidAt ? { ...r, paidAt: Date.now() } : r
+          ),
         })),
       clearAll: () => set({ reservations: [] }),
     }),

@@ -153,6 +153,17 @@ export const IconClose = ({ color = '#fff', size = 18 }: I) => (
   </Svg>
 );
 
+export const IconDumbbell = ({ color = C.green }: I) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M2 9v6 M5 6v12 M8 8v8 M16 8v8 M19 6v12 M22 9v6 M8 12h8"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+    />
+  </Svg>
+);
+
 export const IconRecenter = ({ color = C.green }: I) => (
   <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
     <Circle cx={12} cy={12} r={3} fill={color} />

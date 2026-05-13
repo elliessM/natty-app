@@ -12,7 +12,6 @@ import { useStats } from '../hooks/useStats';
 import BarChart7Days from '../shared/charts/BarChart7Days';
 import CoachCard from '../shared/CoachCard';
 import FadeInView from '../shared/FadeInView';
-import FoodSearchModal from './FoodSearchModal';
 import { useUserStore, HYDRATION_STEP_ML, computeMacroTargets } from '../store/useUserStore';
 import { useJournalStore, formatTime, dayKey, entriesForDay, dayTotals } from '../store/useJournalStore';
 import {
@@ -93,7 +92,6 @@ export default function Dashboard() {
   }, []);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     // Phase 3 : remplacer par un vrai fetch des macros / meals / frigos
@@ -157,15 +155,19 @@ export default function Dashboard() {
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: insets.top + 8 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View
-              style={{
+            <Pressable
+              onPress={() => navigation.navigate('Profile')}
+              accessibilityLabel="Ouvrir mon profil"
+              hitSlop={8}
+              style={({ pressed }) => ({
                 width: 44,
                 height: 44,
                 borderRadius: 22,
                 backgroundColor: C.green,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
+                opacity: pressed ? 0.85 : 1,
+              })}
             >
               <Text
                 style={{
@@ -181,7 +183,7 @@ export default function Dashboard() {
               >
                 {name[0]?.toUpperCase()}
               </Text>
-            </View>
+            </Pressable>
             <View>
               <Text style={{ fontSize: 16, fontWeight: '700', color: C.dark }}>Hello {name} 👋</Text>
               <Text style={{ fontSize: 11, color: C.darkSoft, marginTop: 3 }}>{todayLabel()} · Post-training</Text>
@@ -284,7 +286,7 @@ export default function Dashboard() {
         {nextReservation ? (
           <FadeInView delay={100}>
             <Pressable
-              onPress={() => navigation.navigate('Reservations')}
+              onPress={() => navigation.navigate('OrderTracking', { id: nextReservation.id })}
               style={({ pressed }) => ({
                 marginTop: 14,
                 marginHorizontal: 16,
@@ -598,35 +600,7 @@ export default function Dashboard() {
         )}
       </ScrollView>
 
-      {/* FAB ajout repas */}
-      <Pressable
-        onPress={() => {
-          hapticLight();
-          setSearchOpen(true);
-        }}
-        accessibilityLabel="Ajouter un repas"
-        style={({ pressed }) => ({
-          position: 'absolute',
-          right: 20,
-          bottom: insets.bottom + 24,
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          backgroundColor: C.orange,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: C.orange,
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.45,
-          shadowRadius: 20,
-          elevation: 10,
-          transform: [{ scale: pressed ? 0.95 : 1 }],
-        })}
-      >
-        <Text style={{ color: C.beige, fontSize: 28, fontWeight: '700', lineHeight: 30, marginTop: -2 }}>+</Text>
-      </Pressable>
-
-      <FoodSearchModal visible={searchOpen} onClose={() => setSearchOpen(false)} source="manual" />
+      {/* Le bouton + a été retiré — toute saisie passe par l'onglet Scan central */}
     </View>
   );
 }
