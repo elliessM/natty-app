@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F, softShadow } from '../tokens';
 import MacroRings from '../shared/MacroRings';
-import { IconBell, IconPin, IconArrow, IconTrophy } from '../shared/Icons';
+import { IconBell, IconPin, IconArrow } from '../shared/Icons';
 import WaterGlass from '../shared/WaterGlass';
 import { useSteps, STEPS_GOAL } from '../hooks/useSteps';
 import { useStats } from '../hooks/useStats';
@@ -189,22 +189,6 @@ export default function Dashboard() {
               <Text style={{ fontSize: 11, color: C.darkSoft, marginTop: 3 }}>{todayLabel()} · Post-training</Text>
             </View>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Pressable
-              onPress={() => navigation.navigate('Social')}
-              accessibilityLabel="Communauté"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: C.white,
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...softShadow,
-              }}
-            >
-              <IconTrophy color={C.dark} />
-            </Pressable>
           <Pressable
             accessibilityLabel="Notifications"
             style={{
@@ -232,7 +216,6 @@ export default function Dashboard() {
               }}
             />
           </Pressable>
-          </View>
         </View>
 
         {/* Hero macro card */}

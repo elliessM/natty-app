@@ -10,6 +10,7 @@ import type {
   MainTabsParamList,
   HomeStackParamList,
   SportStackParamList,
+  SocialStackParamList,
 } from './types';
 
 import Dashboard from '../screens/Dashboard';
@@ -22,13 +23,14 @@ import Sport from '../screens/Sport';
 import Fasting from '../screens/Fasting';
 import OrderTracking from '../screens/OrderTracking';
 import MapStack from './MapStack';
-import { IconHome, IconMap, IconDumbbell, IconCamera } from '../shared/Icons';
+import { IconHome, IconMap, IconDumbbell, IconTrophy, IconCamera } from '../shared/Icons';
 import { hapticMedium } from '../shared/haptics';
 import { useCartStore } from '../store/useCartStore';
 
 const Tabs = createBottomTabNavigator<MainTabsParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SportStack = createNativeStackNavigator<SportStackParamList>();
+const SocialStack = createNativeStackNavigator<SocialStackParamList>();
 
 function HomeStackScreen() {
   return (
@@ -50,6 +52,14 @@ function SportStackScreen() {
     <SportStack.Navigator screenOptions={{ headerShown: false }}>
       <SportStack.Screen name="SportHome" component={Sport} />
     </SportStack.Navigator>
+  );
+}
+
+function SocialStackScreen() {
+  return (
+    <SocialStack.Navigator screenOptions={{ headerShown: false }}>
+      <SocialStack.Screen name="SocialHome" component={Social} />
+    </SocialStack.Navigator>
   );
 }
 
@@ -161,6 +171,14 @@ export default function MainTabs() {
         options={{
           title: 'Sport',
           tabBarIcon: ({ focused }) => <IconDumbbell color={focused ? C.green : C.darkSoft} />,
+        }}
+      />
+      <Tabs.Screen
+        name="SocialTab"
+        component={SocialStackScreen}
+        options={{
+          title: 'Social',
+          tabBarIcon: ({ focused }) => <IconTrophy color={focused ? C.green : C.darkSoft} />,
         }}
       />
     </Tabs.Navigator>

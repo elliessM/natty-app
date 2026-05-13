@@ -23,6 +23,7 @@ export type MainTabsParamList = {
   MapTab: undefined;
   ScanTab: undefined;
   SportTab: undefined;
+  SocialTab: undefined;
 };
 
 export type HomeStackParamList = {
@@ -52,6 +53,10 @@ export type ScannerStackParamList = {
 
 export type SportStackParamList = {
   SportHome: undefined;
+};
+
+export type SocialStackParamList = {
+  SocialHome: undefined;
 };
 
 // Screen prop helpers (import as needed in each screen)
