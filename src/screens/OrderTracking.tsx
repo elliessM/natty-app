@@ -173,6 +173,34 @@ export default function OrderTracking({ route }: Props) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
+        {/* Bannière paiement bloquant */}
+        {payAtPickup && !isPaid && !isCancelled && !isPast ? (
+          <View
+            style={{
+              marginHorizontal: 16,
+              marginBottom: 12,
+              padding: 12,
+              borderRadius: 14,
+              backgroundColor: 'rgba(237,126,0,0.12)',
+              borderWidth: 1,
+              borderColor: 'rgba(237,126,0,0.4)',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <Text style={{ fontSize: 22 }}>🔒</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: C.orange, letterSpacing: 0.5 }}>
+                PAIEMENT REQUIS
+              </Text>
+              <Text style={{ fontSize: 11, color: C.darkSoft, marginTop: 2, lineHeight: 15 }}>
+                Le frigo ne s'ouvrira pas tant que la commande n'est pas réglée.
+              </Text>
+            </View>
+          </View>
+        ) : null}
+
         {/* Hero status */}
         <View style={{ paddingHorizontal: 16 }}>
           <LinearGradient
@@ -425,19 +453,22 @@ export default function OrderTracking({ route }: Props) {
             ) : null}
             {isReady ? (
               <Pressable
-                onPress={confirmCollected}
+                onPress={isPaid ? confirmCollected : confirmMarkPaid}
                 style={{
                   paddingVertical: 14,
                   borderRadius: 999,
-                  backgroundColor: C.orange,
+                  backgroundColor: isPaid ? C.orange : C.beige3,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'center',
                   gap: 8,
+                  opacity: isPaid ? 1 : 0.6,
                 }}
               >
-                <IconClock color={C.beige} />
-                <Text style={{ color: C.beige, fontWeight: '700', fontSize: 14 }}>J'ai récupéré ma commande</Text>
+                <Text style={{ fontSize: 14 }}>{isPaid ? '✓' : '🔒'}</Text>
+                <Text style={{ color: isPaid ? C.beige : C.darkSoft, fontWeight: '700', fontSize: 14 }}>
+                  {isPaid ? "J'ai récupéré ma commande" : 'Paiement requis pour débloquer'}
+                </Text>
               </Pressable>
             ) : null}
             <Pressable

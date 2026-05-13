@@ -171,8 +171,8 @@ export default function AchatS2() {
             active={paymentTiming === 'pickup'}
             onPress={() => { hapticSelection(); setPaymentTiming('pickup'); }}
             emoji="⏰"
-            title="Payer au retrait"
-            sub="Tu règles directement au frigo quand tu récupères."
+            title="Réserver, payer plus tard"
+            sub="Tu bloques les produits, paiement à finaliser dans l'app avant retrait."
             badge="DIFFÉRÉ"
           />
         </View>
