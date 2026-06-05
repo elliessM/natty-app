@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions, FlashMode } from 'expo-camera';
 import Svg, { Path } from 'react-native-svg';
+import CameraSurface, { type BarcodeEvent } from '../shared/CameraSurface';
 import { C, F } from '../tokens';
 import { useScanStore, generateMockCandidates, type ScanCandidate } from '../store/useScanStore';
 import { hapticMedium, hapticSuccess, hapticSelection, hapticWarning, hapticLight } from '../shared/haptics';
@@ -135,6 +136,13 @@ export default function ScannerCapture() {
     );
   };
 
+  // Routeur unique : la surface caméra remonte toute détection ici, on
+  // dispatche selon le mode (les handlers re-vérifient le mode par sécurité).
+  const handleBarcode = (e: BarcodeEvent) => {
+    if (mode === 'etiquette') onBarcodeFood(e);
+    else if (mode === 'frigo') onBarcodeFridge(e);
+  };
+
   const triggerPhoto = async () => {
     if (scanning) return;
     hapticMedium();
@@ -151,22 +159,7 @@ export default function ScannerCapture() {
   // ─── Render ────────────────────────────────────────────────────
   return (
     <View style={{ flex: 1, backgroundColor: '#0a0a0a' }}>
-      <CameraView
-        ref={cameraRef}
-        style={{ flex: 1 }}
-        facing="back"
-        enableTorch={flash === 'on'}
-        barcodeScannerSettings={
-          mode === 'etiquette'
-            ? { barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'] }
-            : mode === 'frigo'
-            ? { barcodeTypes: ['qr'] }
-            : undefined
-        }
-        onBarcodeScanned={
-          mode === 'etiquette' ? onBarcodeFood : mode === 'frigo' ? onBarcodeFridge : undefined
-        }
-      />
+      <CameraSurface ref={cameraRef} mode={mode} torch={flash === 'on'} onBarcode={handleBarcode} />
 
       {/* Overlay sombre + cadre */}
       <View pointerEvents="none" style={{ position: 'absolute', inset: 0 as any, top: 0, bottom: 0, left: 0, right: 0 }}>

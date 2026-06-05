@@ -25,14 +25,14 @@ export default function ScannerResult() {
   const selectCandidate = useScanStore((s) => s.selectCandidate);
   const addEntry = useJournalStore((s) => s.addEntry);
 
+  const r: ScanCandidate =
+    selected ??
+    candidates[0] ?? { food: 'Poulet grillé + Riz', kcal: 520, prot: 42, glu: 58, lip: 12, confidence: 0.9, emoji: '🍗' };
+
   const [saved, setSaved] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [nameDraft, setNameDraft] = useState(r.food);
   useEffect(() => setNameDraft(r.food), [r.food]);
-
-  const r: ScanCandidate =
-    selected ??
-    candidates[0] ?? { food: 'Poulet grillé + Riz', kcal: 520, prot: 42, glu: 58, lip: 12, confidence: 0.9, emoji: '🍗' };
 
   const macros = [
     { l: 'Calories', v: r.kcal, u: 'kcal', c: C.orange, pct: 0.24 },
