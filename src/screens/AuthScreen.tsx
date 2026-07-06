@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import Ambience from '../shared/Ambience';
 import { useAuthStore } from '../store/useAuthStore';
 import { hapticLight, hapticSelection, hapticWarning } from '../shared/haptics';
 
 type Mode = 'signin' | 'signup';
+
+// Inscription désactivée temporairement : seul le mode connexion est accessible.
+// Repasser à `true` pour réafficher le bouton "Créer un compte" et réactiver l'inscription.
+const SIGNUP_ENABLED = false;
 
 export default function AuthScreen() {
   const insets = useSafeAreaInsets();
@@ -126,7 +130,7 @@ export default function AuthScreen() {
         </View>
 
         {error ? (
-          <View style={{ marginTop: 16, padding: 12, borderRadius: 14, backgroundColor: 'rgba(237,126,0,0.15)', borderWidth: 1, borderColor: C.orange }}>
+          <View style={{ marginTop: 16, padding: 12, borderRadius: 14, backgroundColor: withAlpha(C.orange, 0.15), borderWidth: 1, borderColor: C.orange }}>
             <Text style={{ color: C.orange, fontSize: 12, fontWeight: '600', lineHeight: 16 }}>{error}</Text>
           </View>
         ) : null}
@@ -138,7 +142,7 @@ export default function AuthScreen() {
             marginTop: 24,
             height: 56,
             borderRadius: 28,
-            backgroundColor: canSubmit ? C.orange : 'rgba(237,126,0,0.35)',
+            backgroundColor: canSubmit ? C.orange : withAlpha(C.orange, 0.35),
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'row',
@@ -159,18 +163,20 @@ export default function AuthScreen() {
           )}
         </Pressable>
 
-        <Pressable
-          onPress={() => {
-            hapticSelection();
-            clearError();
-            setMode(mode === 'signin' ? 'signup' : 'signin');
-          }}
-          style={{ marginTop: 18, alignItems: 'center', padding: 8 }}
-        >
-          <Text style={{ color: C.lime, fontSize: 13, fontWeight: '600' }}>
-            {mode === 'signin' ? "Pas encore de compte ? Créer un compte" : 'Déjà un compte ? Se connecter'}
-          </Text>
-        </Pressable>
+        {SIGNUP_ENABLED ? (
+          <Pressable
+            onPress={() => {
+              hapticSelection();
+              clearError();
+              setMode(mode === 'signin' ? 'signup' : 'signin');
+            }}
+            style={{ marginTop: 18, alignItems: 'center', padding: 8 }}
+          >
+            <Text style={{ color: C.lime, fontSize: 13, fontWeight: '600' }}>
+              {mode === 'signin' ? "Pas encore de compte ? Créer un compte" : 'Déjà un compte ? Se connecter'}
+            </Text>
+          </Pressable>
+        ) : null}
 
         <View style={{ flex: 1, minHeight: 30 }} />
 
@@ -217,9 +223,9 @@ function Field({
         maxLength={maxLength}
         returnKeyType="done"
         style={{
-          backgroundColor: 'rgba(252,233,218,0.08)',
+          backgroundColor: withAlpha(C.beige, 0.08),
           borderWidth: 1,
-          borderColor: 'rgba(252,233,218,0.18)',
+          borderColor: withAlpha(C.beige, 0.18),
           borderRadius: 14,
           paddingHorizontal: 16,
           paddingVertical: 14,
