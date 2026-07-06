@@ -1,5 +1,5 @@
 import { supabase, type DbProfile, type DbJournalEntry, type DbReservation } from './supabase';
-import { useUserStore } from '../store/useUserStore';
+import { useUserStore, todayKey } from '../store/useUserStore';
 import { useJournalStore, type JournalEntry } from '../store/useJournalStore';
 import { useFavoritesStore, type FavoriteItem } from '../store/useFavoritesStore';
 import { useReservationsStore, type Reservation } from '../store/useReservationsStore';
@@ -39,7 +39,7 @@ export async function pullProfile(userId: string) {
     language: p.language ?? 'fr',
     creditsEur: Number(p.credits_eur ?? 0),
     hydrationMl: p.hydration_today?.ml ?? 0,
-    hydrationDay: p.hydration_today?.day ?? new Date().toISOString().slice(0, 10),
+    hydrationDay: p.hydration_today?.day ?? todayKey(),
   });
 
   // Favoris : remplace localement
@@ -158,6 +158,7 @@ function dbResaToLocal(r: DbReservation): Reservation {
     pickupTimestamp: new Date(r.pickup_ts).getTime(),
     total: Number(r.total),
     createdAt: new Date(r.created_at).getTime(),
+    paidAt: r.paid_at ? new Date(r.paid_at).getTime() : undefined,
     cancelledAt: r.cancelled_at ? new Date(r.cancelled_at).getTime() : undefined,
     completedAt: r.completed_at ? new Date(r.completed_at).getTime() : undefined,
   };
@@ -183,6 +184,7 @@ export async function pushReservation(userId: string, r: Reservation) {
     fridge_addr: r.fridgeAddr,
     pickup_ts: new Date(r.pickupTimestamp).toISOString(),
     total: r.total,
+    paid_at: r.paidAt ? new Date(r.paidAt).toISOString() : null,
     cancelled_at: r.cancelledAt ? new Date(r.cancelledAt).toISOString() : null,
     completed_at: r.completedAt ? new Date(r.completedAt).toISOString() : null,
     created_at: new Date(r.createdAt).toISOString(),

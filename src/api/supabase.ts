@@ -67,6 +67,7 @@ export type DbReservation = {
   fridge_addr: string;
   pickup_ts: string;
   total: number;
+  paid_at: string | null;
   cancelled_at: string | null;
   completed_at: string | null;
   created_at: string;

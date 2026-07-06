@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, Alert, Switch, Platform } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
-import { C, F, softShadow } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import { IconBack } from '../shared/Icons';
 import { hapticLight, hapticSelection, hapticSuccess } from '../shared/haptics';
 import { btnDark, btnDarkLabel } from '../shared/Buttons';
@@ -160,7 +160,7 @@ export default function Fasting() {
                 {
                   backgroundColor: completed ? C.orange : C.white,
                   borderWidth: completed ? 0 : 1.5,
-                  borderColor: 'rgba(0,65,47,0.2)',
+                  borderColor: withAlpha(C.green, 0.2),
                   flexDirection: 'row',
                   justifyContent: 'center',
                   gap: 8,
@@ -204,7 +204,7 @@ export default function Fasting() {
                     borderRadius: 14,
                     backgroundColor: active ? C.green : C.white,
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.15)',
+                    borderColor: withAlpha(C.green, 0.15),
                     alignItems: 'center',
                     opacity: startTs ? 0.5 : 1,
                   }}
@@ -345,7 +345,7 @@ export default function Fasting() {
                         width: 36,
                         height: 36,
                         borderRadius: 18,
-                        backgroundColor: s.completed ? 'rgba(190,211,92,0.25)' : 'rgba(237,126,0,0.15)',
+                        backgroundColor: s.completed ? withAlpha(C.lime, 0.25) : withAlpha(C.orange, 0.15),
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
@@ -443,7 +443,7 @@ function ToggleRow({
           hapticSelection();
           onValueChange(v);
         }}
-        trackColor={{ false: '#e0d8ce', true: C.green }}
+        trackColor={{ false: C.line, true: C.green }}
         thumbColor={C.beige}
       />
     </View>

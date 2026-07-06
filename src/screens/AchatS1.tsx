@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, softShadow } from '../tokens';
+import { C, softShadow, withAlpha } from '../tokens';
 import { IconBack, IconArrow } from '../shared/Icons';
 import { PRODUCTS, formatPrice } from '../data/products';
 import { PRODUCT_IMAGES } from '../data/images';
@@ -88,8 +88,8 @@ export default function AchatS1() {
         end={{ x: 1, y: 1 }}
         style={{ marginTop: 16, marginHorizontal: 16, height: 180, borderRadius: 24, overflow: 'hidden', padding: 20 }}
       >
-        <View style={{ position: 'absolute', right: -40, top: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(237,126,0,0.35)' }} />
-        <View style={{ position: 'absolute', left: -40, bottom: -40, width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(190,211,92,0.3)' }} />
+        <View style={{ position: 'absolute', right: -40, top: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: withAlpha(C.orange, 0.35) }} />
+        <View style={{ position: 'absolute', left: -40, bottom: -40, width: 120, height: 120, borderRadius: 60, backgroundColor: withAlpha(C.lime, 0.3) }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: C.lime }} />
           <Text style={{ fontSize: 12, fontWeight: '700', color: C.beige }}>12 produits disponibles</Text>
@@ -109,10 +109,10 @@ export default function AchatS1() {
           }}
         >
           <View style={{ position: 'absolute', left: '50%', top: 22, width: 4, height: 34, backgroundColor: C.green, borderRadius: 2, marginLeft: -2 }} />
-          <View style={{ position: 'absolute', left: 8, top: 8, right: 8, height: 40, backgroundColor: 'rgba(237,126,0,0.55)', borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ position: 'absolute', left: 8, top: 8, right: 8, height: 40, backgroundColor: withAlpha(C.orange, 0.55), borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: 20 }}>🍗 🥗</Text>
           </View>
-          <View style={{ position: 'absolute', left: 8, top: 54, right: 8, height: 40, backgroundColor: 'rgba(190,211,92,0.55)', borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ position: 'absolute', left: 8, top: 54, right: 8, height: 40, backgroundColor: withAlpha(C.lime, 0.55), borderRadius: 6, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ fontSize: 18 }}>🥤 🍫</Text>
           </View>
         </View>
@@ -208,7 +208,7 @@ export default function AchatS1() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: C.dark }}>{formatPrice(p.price)}</Text>
-                    <Text style={{ fontSize: 10, color: C.darkSoft, marginLeft: 4 }}>EUR</Text>
+                    <Text style={{ fontSize: 10, color: C.darkSoft, marginLeft: 4 }}>€</Text>
                   </View>
                   <Pressable
                     onPress={() => {
@@ -276,7 +276,7 @@ export default function AchatS1() {
             }}
           >
             <Text style={{ color: C.beige, fontWeight: '700', fontSize: 15 }}>
-              Acheter maintenant · {formatPrice(subtotal)} EUR
+              Acheter maintenant · {formatPrice(subtotal * 0.95 + 0.3)} €
             </Text>
             <IconArrow />
           </Pressable>
@@ -308,7 +308,7 @@ export default function AchatS1() {
         onConfirm={handleReserve}
         title="Programmer ma commande"
         subtitle={`Bloque ${items.length} article${items.length > 1 ? 's' : ''} chez ${currentFridge.name} pour le créneau de ton choix.`}
-        ctaLabel={`Programmer · ${formatPrice(subtotal * 0.95 + 0.3)} EUR`}
+        ctaLabel={`Programmer · ${formatPrice(subtotal * 0.95 + 0.3)} €`}
       />
     </View>
   );

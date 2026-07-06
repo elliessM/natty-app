@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, Easing } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import StatusBar from '../shared/StatusBar';
 import HomeIndicator from '../shared/HomeIndicator';
 import Ambience from '../shared/Ambience';
@@ -123,7 +123,7 @@ export default function AchatS4() {
                 width: i <= phase ? 28 : 10,
                 height: 10,
                 borderRadius: 5,
-                backgroundColor: i <= phase ? C.orange : 'rgba(252,233,218,0.2)',
+                backgroundColor: i <= phase ? C.orange : withAlpha(C.beige, 0.2),
               }}
             />
           ))}

@@ -166,12 +166,12 @@ export default function AchatS5() {
                 <Text style={{ fontSize: 10, color: C.darkSoft }}>×{p.qty}</Text>
               </View>
             </View>
-            <Text style={{ fontWeight: '700', fontSize: 13, color: C.dark }}>{formatPrice(p.price * p.qty)} EUR</Text>
+            <Text style={{ fontWeight: '700', fontSize: 13, color: C.dark }}>{formatPrice(p.price * p.qty)} €</Text>
           </View>
         ))}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }}>
           <Text style={{ fontWeight: '700' }}>Total</Text>
-          <Text style={{ fontWeight: '700', color: C.orange }}>{formatPrice(total)} EUR</Text>
+          <Text style={{ fontWeight: '700', color: C.orange }}>{formatPrice(total)} €</Text>
         </View>
       </View>
 

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow, cardShadow } from '../tokens';
+import { C, F, softShadow, cardShadow, withAlpha } from '../tokens';
 import { IconBack } from '../shared/Icons';
 import BarChart7Days from '../shared/charts/BarChart7Days';
 import WeightLineChart from '../shared/charts/WeightLineChart';
@@ -107,8 +107,8 @@ export default function Stats() {
           end={{ x: 1, y: 1 }}
           style={{ marginHorizontal: 16, marginTop: 16, padding: 18, borderRadius: 24, overflow: 'hidden' }}
         >
-          <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(237,126,0,0.18)' }} />
-          <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(190,211,92,0.12)' }} />
+          <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.orange, 0.18) }} />
+          <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.lime, 0.12) }} />
 
           <Text style={{ fontSize: 10, letterSpacing: 3, color: C.lime, fontWeight: '700' }}>MOYENNE QUOTIDIENNE</Text>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 6, gap: 8 }}>
@@ -225,7 +225,7 @@ export default function Stats() {
 
         {/* Insight card */}
         <FadeInView delay={450}>
-        <View style={[cardStyle, { marginTop: 16, backgroundColor: 'rgba(190,211,92,0.18)' }]}>
+        <View style={[cardStyle, { marginTop: 16, backgroundColor: withAlpha(C.lime, 0.18) }]}>
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
             <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ color: C.lime, fontWeight: '700', fontFamily: F.display }}>N</Text>
@@ -272,7 +272,7 @@ function coachInsight(
 
 function MacroPill({ label, value, target, color }: { label: string; value: string; target: string; color: string }) {
   return (
-    <View style={{ flex: 1, padding: 10, borderRadius: 12, backgroundColor: 'rgba(252,233,218,0.1)' }}>
+    <View style={{ flex: 1, padding: 10, borderRadius: 12, backgroundColor: withAlpha(C.beige, 0.1) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
         <Text style={{ fontSize: 9, fontWeight: '700', color: C.lime, letterSpacing: 1 }}>{label.toUpperCase()}</Text>

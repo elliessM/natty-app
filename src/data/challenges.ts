@@ -1,4 +1,5 @@
 import type { Goal } from '../types';
+import { C } from '../tokens';
 import type { JournalEntry } from '../store/useJournalStore';
 import { dayKey, entriesForDay, dayTotals } from '../store/useJournalStore';
 
@@ -19,15 +20,16 @@ type Ctx = {
   targets: { kcal: number; prot: number; glu: number; lip: number };
   journal: JournalEntry[];
   hydrationMl: number;
+  hydrationGoalMl: number;
   stepsToday: number;
 };
 
 const COLORS = {
-  orange: '#ed7e00',
-  lime: '#bed35c',
-  green: '#00412f',
-  beige: '#fce9da',
-  berry: '#c94f5e',
+  orange: C.orange,
+  lime: C.lime,
+  green: C.green,
+  beige: C.beige,
+  berry: '#c94f5e', // pas d'équivalent dans la palette
 };
 
 /**
@@ -35,7 +37,7 @@ const COLORS = {
  * La progression est calculée live à partir du journal, de l'hydratation et des pas.
  */
 export function generateChallenges(ctx: Ctx): Challenge[] {
-  const { goal, targets, journal, hydrationMl, stepsToday } = ctx;
+  const { goal, targets, journal, hydrationMl, hydrationGoalMl, stepsToday } = ctx;
 
   // ─── Mesures dérivées sur 7 jours ─────────────────────────────
   const today = dayKey(Date.now());
@@ -141,13 +143,13 @@ export function generateChallenges(ctx: Ctx): Challenge[] {
   } else if (goal === 'energy') {
     personal.push({
       id: 'energy-hydration-5',
-      title: "Boire 2L d'eau 5 jours d'affilée",
+      title: `Atteindre ${(hydrationGoalMl / 1000).toLocaleString('fr-FR')}L d'eau 5 jours d'affilée`,
       emoji: '💧',
       color: COLORS.lime,
       reward: '+60 pts',
       rewardPts: 60,
       // Pas d'historique hydratation sur 7 jours (stocké qu'en courant) → estimation.
-      current: hydrationMl >= 2000 ? 1 : 0,
+      current: hydrationMl >= hydrationGoalMl ? 1 : 0,
       target: 5,
       scope: 'personal',
     });

@@ -75,7 +75,12 @@ type UserState = {
   reset: () => void;
 };
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+// Clé 'YYYY-MM-DD' en date LOCALE : toISOString() donnerait la date UTC,
+// et l'hydratation se réinitialiserait à 1h/2h du matin en France au lieu de minuit.
+export const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 const initial = {
   name: 'Noé',
@@ -151,11 +156,12 @@ export const useUserStore = create<UserState>()(
       setLanguage: (language) => set({ language }),
       addWeightEntry: (kg) =>
         set((s) => {
+          const v = clamp(Math.round(kg * 10) / 10, 30, 200);
           const today = todayKey();
           const cleaned = s.weightHistory.filter((e) => e.date !== today);
           return {
-            weightHistory: [...cleaned, { date: today, kg }].sort((a, b) => a.date.localeCompare(b.date)),
-            weightKg: kg,
+            weightHistory: [...cleaned, { date: today, kg: v }].sort((a, b) => a.date.localeCompare(b.date)),
+            weightKg: v,
           };
         }),
       setWeightHistory: (weightHistory) => set({ weightHistory }),

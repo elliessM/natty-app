@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import { hapticSelection, hapticMedium } from './haptics';
 import type { ScanCandidate } from '../store/useScanStore';
 
@@ -83,7 +83,7 @@ export default function ScanEditSheet({ visible, initial, onClose, onConfirm }: 
             ...cardShadow,
           }}
         >
-          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0', marginBottom: 14 }} />
+          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: C.line, marginBottom: 14 }} />
           <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.dark }}>Modifier le repas</Text>
           <Text style={{ fontSize: 12, color: C.darkSoft, marginTop: 4 }}>
             Corrige le nom ou ajuste les quantités avant d'ajouter au journal.
@@ -134,7 +134,7 @@ export default function ScanEditSheet({ visible, initial, onClose, onConfirm }: 
                     backgroundColor: C.beige,
                     alignItems: 'center',
                     borderWidth: 1.5,
-                    borderColor: 'rgba(0,65,47,0.12)',
+                    borderColor: withAlpha(C.green, 0.12),
                   }}
                 >
                   <Text style={{ color: C.dark, fontWeight: '700', fontSize: 13 }}>×{m}</Text>

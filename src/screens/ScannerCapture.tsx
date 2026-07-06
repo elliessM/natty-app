@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions, FlashMode } from 'expo-camera';
 import Svg, { Path } from 'react-native-svg';
 import CameraSurface, { type BarcodeEvent } from '../shared/CameraSurface';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import { useScanStore, generateMockCandidates, type ScanCandidate } from '../store/useScanStore';
 import { hapticMedium, hapticSuccess, hapticSelection, hapticWarning, hapticLight } from '../shared/haptics';
 import { getFoodByBarcode, macrosForPortion, guessEmoji } from '../api/foods';
@@ -125,7 +125,9 @@ export default function ScannerCapture() {
             setBusy(false);
             close();
             setTimeout(() => {
-              navigation.getParent()?.getParent()?.navigate('Main', {
+              // ScannerStack est monté directement sous le Root : un seul getParent suffit
+              // (un deuxième renvoie undefined et la navigation devient un no-op silencieux).
+              navigation.getParent()?.navigate('Main', {
                 screen: 'MapTab',
                 params: { screen: 'AchatS1' },
               });
@@ -260,9 +262,9 @@ export default function ScannerCapture() {
                   paddingVertical: 8,
                   paddingHorizontal: 14,
                   borderRadius: 999,
-                  backgroundColor: active ? C.lime : 'rgba(252,233,218,0.12)',
+                  backgroundColor: active ? C.lime : withAlpha(C.beige, 0.12),
                   borderWidth: 1,
-                  borderColor: active ? C.lime : 'rgba(252,233,218,0.22)',
+                  borderColor: active ? C.lime : withAlpha(C.beige, 0.22),
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 5,
@@ -328,9 +330,9 @@ export default function ScannerCapture() {
                 paddingVertical: 10,
                 paddingHorizontal: 18,
                 borderRadius: 999,
-                backgroundColor: 'rgba(252,233,218,0.12)',
+                backgroundColor: withAlpha(C.beige, 0.12),
                 borderWidth: 1,
-                borderColor: 'rgba(252,233,218,0.22)',
+                borderColor: withAlpha(C.beige, 0.22),
               }}
             >
               <Text style={{ fontFamily: F.bodyMedium, color: C.beige, fontSize: 12 }}>Scan auto à la détection</Text>
@@ -405,7 +407,7 @@ function Frame({ mode, progress }: { mode: Mode; progress: number }) {
           height: size.h,
           borderRadius: isSquare ? 20 : 24,
           borderWidth: 2,
-          borderColor: 'rgba(190,211,92,0.65)',
+          borderColor: withAlpha(C.lime, 0.65),
         }}
       >
         {/* 4 coins orange */}

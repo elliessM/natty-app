@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Path } from 'react-native-svg';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import { IconSearch, IconFilter, IconPin, IconClock, IconBox, IconRecenter } from '../shared/Icons';
 import { FRIDGES, distanceMeters, formatDistance, walkingTime } from '../data/fridges';
 import { useLocation } from '../hooks/useLocation';
@@ -179,7 +179,7 @@ export default function SmartMap() {
         }}
       >
         <IconSearch />
-        <Text style={{ flex: 1, fontSize: 13, color: '#8a8a8a' }}>Trouver un Natty Fridge...</Text>
+        <Text style={{ flex: 1, fontSize: 13, color: C.mute }}>Trouver un Natty Fridge...</Text>
         <IconFilter />
       </View>
       {/* Preview banner — mention claire pour la démo, sans casser le parcours */}
@@ -192,7 +192,7 @@ export default function SmartMap() {
           paddingVertical: 6,
           paddingHorizontal: 12,
           borderRadius: 999,
-          backgroundColor: 'rgba(0,65,47,0.85)',
+          backgroundColor: withAlpha(C.green, 0.85),
           flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
@@ -214,7 +214,7 @@ export default function SmartMap() {
               borderRadius: 999,
               backgroundColor: c.on ? C.green : C.white,
               borderWidth: c.on ? 0 : 1,
-              borderColor: 'rgba(0,65,47,0.2)',
+              borderColor: withAlpha(C.green, 0.2),
             }}
           >
             <Text style={{ color: c.on ? C.beige : C.dark, fontSize: 10, fontWeight: c.on ? '700' : '500' }}>{c.t}</Text>
@@ -226,7 +226,7 @@ export default function SmartMap() {
         const fridge = sortedFridges[i];
         if (!fridge) return null;
         const isSel = fridge.id === closestOpen?.id;
-        const color = !fridge.open ? '#888' : isSel ? C.orange : C.green;
+        const color = !fridge.open ? C.mute : isSel ? C.orange : C.green;
         return (
           <View key={fridge.id} style={{ position: 'absolute', left: p.x, top: p.y }}>
             {isSel ? (
@@ -334,7 +334,7 @@ export default function SmartMap() {
             {sortedFridges.filter((f) => f.open).length} disponibles
           </Text>
         </View>
-        <Text style={{ paddingHorizontal: 20, paddingBottom: 6, fontSize: 11, color: '#8a8a8a' }}>
+        <Text style={{ paddingHorizontal: 20, paddingBottom: 6, fontSize: 11, color: C.mute }}>
           {granted ? 'Trié par distance' : 'Position indisponible · distances relatives'}
         </Text>
         <ScrollView style={{ paddingHorizontal: 14 }} contentContainerStyle={{ gap: 10, paddingBottom: 120 }}>
@@ -357,27 +357,27 @@ export default function SmartMap() {
               >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <View>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? '#999' : C.dark }}>{f.name}</Text>
-                    <Text style={{ fontSize: 11, color: disabled ? '#999' : C.darkSoft, marginTop: 2 }}>{f.addr}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? C.mute : C.dark }}>{f.name}</Text>
+                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.darkSoft, marginTop: 2 }}>{f.addr}</Text>
                   </View>
                   <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: f.open ? '#d4edda' : '#fde8e8' }}>
-                    <Text style={{ fontSize: 10, fontWeight: '700', color: f.open ? C.green : '#c44' }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: f.open ? C.green : C.danger }}>
                       {f.open ? '● Ouvert' : '● Fermé'}
                     </Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconPin color={disabled ? '#999' : C.green} size={10} />
-                    <Text style={{ fontSize: 11, color: disabled ? '#999' : C.green }}>{f.distLabel}</Text>
+                    <IconPin color={disabled ? C.mute : C.green} size={10} />
+                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.distLabel}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconClock color={disabled ? '#999' : C.green} />
-                    <Text style={{ fontSize: 11, color: disabled ? '#999' : C.green }}>{f.timeLabel}</Text>
+                    <IconClock color={disabled ? C.mute : C.green} />
+                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.timeLabel}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconBox color={disabled ? '#999' : C.orange} />
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: disabled ? '#999' : C.orange }}>
+                    <IconBox color={disabled ? C.mute : C.orange} />
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: disabled ? C.mute : C.orange }}>
                       {f.stockCount > 0 ? `${f.stockCount} produits` : 'Aucun produit'}
                     </Text>
                   </View>

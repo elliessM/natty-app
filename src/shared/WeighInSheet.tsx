@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import { hapticSelection, hapticSuccess } from './haptics';
 import { useUserStore } from '../store/useUserStore';
 
@@ -63,7 +63,7 @@ export default function WeighInSheet({ visible, onClose }: Props) {
             ...cardShadow,
           }}
         >
-          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0', marginBottom: 14 }} />
+          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: C.line, marginBottom: 14 }} />
           <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.dark }}>
             ⚖️ Peser aujourd'hui
           </Text>
@@ -114,7 +114,7 @@ export default function WeighInSheet({ visible, onClose }: Props) {
                 paddingVertical: 10,
                 paddingHorizontal: 14,
                 borderRadius: 14,
-                backgroundColor: 'rgba(190,211,92,0.18)',
+                backgroundColor: withAlpha(C.lime, 0.18),
               }}
             >
               <Text style={{ fontSize: 12, color: C.dark, lineHeight: 18 }}>
@@ -129,7 +129,7 @@ export default function WeighInSheet({ visible, onClose }: Props) {
           ) : null}
 
           {!valid ? (
-            <Text style={{ marginTop: 10, fontSize: 11, color: '#c44', fontWeight: '600' }}>
+            <Text style={{ marginTop: 10, fontSize: 11, color: C.danger, fontWeight: '600' }}>
               Saisis une valeur entre 30 et 200 kg.
             </Text>
           ) : null}

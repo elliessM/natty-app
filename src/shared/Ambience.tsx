@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
+import { C, withAlpha } from '../tokens';
 
 export default function Ambience() {
   return (
@@ -12,7 +13,7 @@ export default function Ambience() {
           width: 340,
           height: 340,
           borderRadius: 170,
-          backgroundColor: 'rgba(190,211,92,0.08)',
+          backgroundColor: withAlpha(C.lime, 0.08),
         }}
         pointerEvents="none"
       />
@@ -24,7 +25,7 @@ export default function Ambience() {
           width: 260,
           height: 260,
           borderRadius: 130,
-          backgroundColor: 'rgba(237,126,0,0.14)',
+          backgroundColor: withAlpha(C.orange, 0.14),
         }}
         pointerEvents="none"
       />

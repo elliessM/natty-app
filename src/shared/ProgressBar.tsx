@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { C } from '../tokens';
+import { C, withAlpha } from '../tokens';
 
 type Props = { step: number; total?: number };
 
@@ -17,7 +17,7 @@ export default function ProgressBar({ step, total = 4 }: Props) {
         gap: 10,
       }}
     >
-      <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: 'rgba(190,211,92,0.25)', overflow: 'hidden' }}>
+      <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: withAlpha(C.lime, 0.25), overflow: 'hidden' }}>
         <View
           style={{
             width: `${(step / total) * 100}%`,

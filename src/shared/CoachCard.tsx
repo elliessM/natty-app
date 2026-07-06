@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import { hapticLight, hapticSelection } from './haptics';
 import FoodSearchModal from '../screens/FoodSearchModal';
 import { useUserStore, computeMacroTargets } from '../store/useUserStore';
@@ -11,9 +11,9 @@ import { useSteps } from '../hooks/useSteps';
 import { generateCoachTip, type CoachAction } from '../data/coach';
 
 const TONE_COLORS = {
-  orange: { bg: 'rgba(237,126,0,0.12)', accent: C.orange },
-  lime: { bg: 'rgba(190,211,92,0.18)', accent: C.green },
-  green: { bg: 'rgba(0,65,47,0.08)', accent: C.green },
+  orange: { bg: withAlpha(C.orange, 0.12), accent: C.orange },
+  lime: { bg: withAlpha(C.lime, 0.18), accent: C.green },
+  green: { bg: withAlpha(C.green, 0.08), accent: C.green },
   beige: { bg: C.beige, accent: C.darkSoft },
 } as const;
 

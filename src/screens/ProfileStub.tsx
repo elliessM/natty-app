@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, TextInput, Alert, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, cardShadow, softShadow } from '../tokens';
+import { C, F, cardShadow, softShadow, withAlpha } from '../tokens';
 import {
   useUserStore,
   computeMacroTargets,
@@ -281,7 +281,7 @@ export default function Profile() {
                       backgroundColor: active ? C.green : C.beige,
                       alignItems: 'center',
                       borderWidth: active ? 0 : 1.5,
-                      borderColor: 'rgba(0,65,47,0.15)',
+                      borderColor: withAlpha(C.green, 0.15),
                     }}
                   >
                     <Text style={{ color: active ? C.beige : C.dark, fontSize: 13, fontWeight: active ? '700' : '500' }}>{s.label}</Text>
@@ -490,7 +490,7 @@ export default function Profile() {
                     borderRadius: 999,
                     backgroundColor: active ? C.green : C.beige,
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.12)',
+                    borderColor: withAlpha(C.green, 0.12),
                   }}
                 >
                   <Text style={{ color: active ? C.beige : C.dark, fontSize: 12, fontWeight: active ? '700' : '500' }}>
@@ -546,7 +546,7 @@ export default function Profile() {
                     borderRadius: 999,
                     backgroundColor: active ? C.orange : C.beige,
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.15)',
+                    borderColor: withAlpha(C.green, 0.15),
                   }}
                 >
                   <Text style={{ color: active ? C.beige : C.dark, fontSize: 12, fontWeight: active ? '700' : '500' }}>{a.short}</Text>
@@ -580,7 +580,7 @@ export default function Profile() {
                     borderRadius: 999,
                     backgroundColor: active ? C.green : C.beige,
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.15)',
+                    borderColor: withAlpha(C.green, 0.15),
                   }}
                 >
                   <Text style={{ fontSize: 14 }}>{g.emoji}</Text>
@@ -740,7 +740,7 @@ export default function Profile() {
               paddingVertical: 6,
             }}
           >
-            <Text style={{ color: '#c44', fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' }}>
+            <Text style={{ color: C.danger, fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' }}>
               Supprimer mon compte
             </Text>
           </Pressable>
@@ -868,12 +868,12 @@ export default function Profile() {
               height: 48,
               borderRadius: 24,
               borderWidth: 1.5,
-              borderColor: '#c44',
+              borderColor: C.danger,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: '#c44', fontWeight: '700', fontSize: 13 }}>Tout réinitialiser (local)</Text>
+            <Text style={{ color: C.danger, fontWeight: '700', fontSize: 13 }}>Tout réinitialiser (local)</Text>
           </Pressable>
         </Card>
 
@@ -1028,7 +1028,7 @@ function SettingToggle({
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: '#d8d2c8', true: C.lime }}
+        trackColor={{ false: C.line, true: C.lime }}
         thumbColor={value ? C.green : '#f1f1f1'}
         ios_backgroundColor="#d8d2c8"
       />
@@ -1063,7 +1063,7 @@ function SettingPills<T extends string>({
                 borderRadius: 999,
                 backgroundColor: active ? C.green : C.beige,
                 borderWidth: active ? 0 : 1.5,
-                borderColor: 'rgba(0,65,47,0.15)',
+                borderColor: withAlpha(C.green, 0.15),
                 alignItems: 'center',
               }}
             >

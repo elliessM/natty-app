@@ -13,7 +13,18 @@ export const C = {
   darkSoft: '#5a5042',
   white: '#ffffff',
   mute: '#8a8a8a',
+  danger: '#c44', // actions destructives (annuler, supprimer, réinitialiser)
+  line: '#d8d2c8', // séparateurs, pistes de switch off, éléments inactifs clairs
+  lipid: '#d4a574', // couleur sémantique macro lipides (partout la même)
 };
+
+/** 'rgba(...)' dérivé d'un token hex — évite les rgba en dur qui se désynchronisent de la palette. */
+export function withAlpha(hex: string, alpha: number): string {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const n = parseInt(full, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
 
 export const F = {
   display: 'Obviously', // aliasé sur Archivo_900Black au runtime

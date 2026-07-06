@@ -27,11 +27,11 @@ export function isIosStandaloneRequired(): boolean {
   return !isStandalone;
 }
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);
-  const out = new Uint8Array(rawData.length);
+  const out = new Uint8Array(new ArrayBuffer(rawData.length));
   for (let i = 0; i < rawData.length; i++) out[i] = rawData.charCodeAt(i);
   return out;
 }
@@ -104,7 +104,14 @@ export async function unsubscribe(userId: string): Promise<void> {
   const reg = await navigator.serviceWorker.getRegistration();
   const sub = await reg?.pushManager.getSubscription();
   if (sub) {
-    await supabase.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', sub.endpoint).catch(() => {});
+    // Pas de .catch() ici : le query builder Supabase n'est pas une vraie Promise
+    // (appeler .catch dessus lève un TypeError) ; les erreurs arrivent dans `error`.
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .delete()
+      .eq('user_id', userId)
+      .eq('endpoint', sub.endpoint);
+    if (error) console.warn('[webpush] unsubscribe', error.message);
     await sub.unsubscribe().catch(() => {});
   }
 }

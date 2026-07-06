@@ -1,5 +1,5 @@
 import { ViewStyle, TextStyle } from 'react-native';
-import { C, F, ctaShadow } from '../tokens';
+import { C, F, ctaShadow, withAlpha } from '../tokens';
 
 export const btnPrimary = (): ViewStyle => ({
   width: '100%',
@@ -76,5 +76,5 @@ export const optionCard = (selected: boolean, accent = C.orange): ViewStyle => (
   borderRadius: 18,
   backgroundColor: selected ? accent : C.beige,
   borderWidth: selected ? 0 : 1.5,
-  borderColor: 'rgba(0,65,47,0.15)',
+  borderColor: withAlpha(C.green, 0.15),
 });

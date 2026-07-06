@@ -1,6 +1,7 @@
 // Feed communauté — posts mock pour démo. En prod : alimenté par Supabase
 // (table `social_posts` + RLS, suivi des amis).
 
+import { C } from '../tokens';
 import { WORKOUT_META, type WorkoutType } from '../store/useSportStore';
 
 export type FeedPostKind =
@@ -73,7 +74,7 @@ const COMMUNITY_POSTS: FeedPost[] = [
     id: 'c3',
     authorName: 'Chloé Bertin',
     authorAvatar: 'C',
-    avatarColor: '#d4a574',
+    avatarColor: C.lipid,
     kind: 'fast',
     timestamp: now - 8 * HOUR,
     title: '16:8 validé',

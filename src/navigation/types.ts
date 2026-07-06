@@ -32,7 +32,6 @@ export type HomeStackParamList = {
   Reservations: undefined;
   Stats: undefined;
   Profile: undefined;
-  Social: undefined;
   Fasting: undefined;
   OrderTracking: { id: string };
 };

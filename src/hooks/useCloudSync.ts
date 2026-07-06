@@ -113,6 +113,7 @@ export function useCloudSync() {
           !before ||
           before.cancelledAt !== r.cancelledAt ||
           before.completedAt !== r.completedAt ||
+          before.paidAt !== r.paidAt ||
           before.pickupTimestamp !== r.pickupTimestamp
         ) {
           pushReservation(userId, r).catch(() => {});

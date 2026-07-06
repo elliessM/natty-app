@@ -79,7 +79,7 @@ export function generateCoachTip(ctx: Ctx): CoachTip {
       id: 'hydrate-low',
       emoji: '💧',
       headline: `Tu es à ${Math.round(hydratRatio * 100)}% de ton hydratation`,
-      body: `Il te reste ${Math.max(0, hydrationGoalMl - hydrationMl)} mL pour atteindre 2 L. Pause eau ?`,
+      body: `Il te reste ${Math.max(0, hydrationGoalMl - hydrationMl)} mL pour atteindre ton objectif. Pause eau ?`,
       tone: 'lime',
       actions: [{ label: '+ 250 mL', type: 'hydrate' }],
       priority: 65,

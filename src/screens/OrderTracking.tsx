@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow, cardShadow } from '../tokens';
+import { C, F, softShadow, cardShadow, withAlpha } from '../tokens';
 import { IconBack, IconPin, IconClock } from '../shared/Icons';
 import {
   useReservationsStore,
@@ -91,7 +91,6 @@ export default function OrderTracking({ route }: Props) {
 
   const itemCount = reservation.items.reduce((sum, it) => sum + it.qty, 0);
   const isPaid = !!reservation.paidAt;
-  const payAtPickup = reservation.paymentTiming === 'pickup';
 
   const confirmMarkPaid = () => {
     Alert.alert('Confirmer le paiement ?', `Régler ${formatPrice(reservation.total)} € maintenant.`, [
@@ -173,17 +172,17 @@ export default function OrderTracking({ route }: Props) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
-        {/* Bannière paiement bloquant */}
-        {payAtPickup && !isPaid && !isCancelled && !isPast ? (
+        {/* Bannière paiement bloquant (sécurité : ne devrait pas arriver, tout est payé à la commande) */}
+        {!isPaid && !isCancelled && !isPast ? (
           <View
             style={{
               marginHorizontal: 16,
               marginBottom: 12,
               padding: 12,
               borderRadius: 14,
-              backgroundColor: 'rgba(237,126,0,0.12)',
+              backgroundColor: withAlpha(C.orange, 0.12),
               borderWidth: 1,
-              borderColor: 'rgba(237,126,0,0.4)',
+              borderColor: withAlpha(C.orange, 0.4),
               flexDirection: 'row',
               alignItems: 'center',
               gap: 10,
@@ -206,7 +205,7 @@ export default function OrderTracking({ route }: Props) {
           <LinearGradient
             colors={
               isCancelled
-                ? ['#8a8a8a', '#5a5a5a']
+                ? [C.mute, C.darkSoft]
                 : isReady
                 ? [C.orange, C.orangeSoft]
                 : isPast
@@ -217,8 +216,8 @@ export default function OrderTracking({ route }: Props) {
             end={{ x: 1, y: 1 }}
             style={{ borderRadius: 22, padding: 20, overflow: 'hidden' }}
           >
-            <View style={{ position: 'absolute', right: -50, top: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(190,211,92,0.14)' }} />
-            <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(237,126,0,0.12)' }} />
+            <View style={{ position: 'absolute', right: -50, top: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: withAlpha(C.lime, 0.14) }} />
+            <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.orange, 0.12) }} />
 
             <Text style={{ fontSize: 10, letterSpacing: 2.5, color: C.lime, fontWeight: '700' }}>
               {isCancelled ? 'ANNULÉE' : isReady ? '● DISPO MAINTENANT' : isPast ? 'CLÔTURÉE' : 'RETRAIT PRÉVU'}
@@ -246,23 +245,17 @@ export default function OrderTracking({ route }: Props) {
                 paddingVertical: 8,
                 paddingHorizontal: 12,
                 borderRadius: 12,
-                backgroundColor: isPaid
-                  ? 'rgba(190,211,92,0.22)'
-                  : payAtPickup
-                  ? 'rgba(237,126,0,0.22)'
-                  : 'rgba(252,233,218,0.15)',
+                backgroundColor: isPaid ? withAlpha(C.lime, 0.22) : withAlpha(C.orange, 0.22),
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 8,
               }}
             >
-              <Text style={{ fontSize: 14 }}>{isPaid ? '✓' : payAtPickup ? '⏰' : '⚡'}</Text>
+              <Text style={{ fontSize: 14 }}>{isPaid ? '✓' : '🔒'}</Text>
               <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: C.beige }}>
                 {isPaid
                   ? `PAYÉ · ${formatPrice(reservation.total)} €`
-                  : payAtPickup
-                  ? `À RÉGLER AU RETRAIT · ${formatPrice(reservation.total)} €`
-                  : 'PAIEMENT IMMÉDIAT'}
+                  : `À RÉGLER · ${formatPrice(reservation.total)} €`}
               </Text>
             </View>
           </LinearGradient>
@@ -301,7 +294,7 @@ export default function OrderTracking({ route }: Props) {
                           alignItems: 'center',
                           justifyContent: 'center',
                           borderWidth: current ? 3 : 0,
-                          borderColor: current ? 'rgba(237,126,0,0.25)' : 'transparent',
+                          borderColor: current ? withAlpha(C.orange, 0.25) : 'transparent',
                         }}
                       >
                         <Text style={{ fontSize: 12, color: C.beige, fontWeight: '700' }}>
@@ -368,7 +361,7 @@ export default function OrderTracking({ route }: Props) {
                 width: 44,
                 height: 44,
                 borderRadius: 14,
-                backgroundColor: 'rgba(0,65,47,0.08)',
+                backgroundColor: withAlpha(C.green, 0.08),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -432,7 +425,7 @@ export default function OrderTracking({ route }: Props) {
         {/* Actions */}
         {!isCancelled && !isPast ? (
           <View style={{ paddingHorizontal: 16, marginTop: 22, gap: 10 }}>
-            {payAtPickup && !isPaid ? (
+            {!isPaid ? (
               <Pressable
                 onPress={confirmMarkPaid}
                 style={{
@@ -477,11 +470,11 @@ export default function OrderTracking({ route }: Props) {
                 paddingVertical: 12,
                 borderRadius: 999,
                 borderWidth: 1.5,
-                borderColor: '#c44',
+                borderColor: C.danger,
                 alignItems: 'center',
               }}
             >
-              <Text style={{ color: '#c44', fontWeight: '700', fontSize: 13 }}>Annuler la commande</Text>
+              <Text style={{ color: C.danger, fontWeight: '700', fontSize: 13 }}>Annuler la commande</Text>
             </Pressable>
           </View>
         ) : null}
@@ -501,7 +494,7 @@ function Mini({ label, value }: { label: string; value: string }) {
     <View
       style={{
         flex: 1,
-        backgroundColor: 'rgba(252,233,218,0.12)',
+        backgroundColor: withAlpha(C.beige, 0.12),
         borderRadius: 12,
         paddingVertical: 8,
         paddingHorizontal: 10,

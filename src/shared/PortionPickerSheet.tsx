@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Modal, TextInput, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import { hapticSelection, hapticMedium } from './haptics';
 import { macrosForPortion, type FoodHit, guessEmoji } from '../api/foods';
 
@@ -50,7 +50,7 @@ export default function PortionPickerSheet({ food, onClose, onConfirm }: Props) 
             ...cardShadow,
           }}
         >
-          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0', marginBottom: 14 }} />
+          <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: C.line, marginBottom: 14 }} />
 
           {/* Food header */}
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
@@ -129,7 +129,7 @@ export default function PortionPickerSheet({ food, onClose, onConfirm }: Props) 
                     backgroundColor: active ? C.green : C.beige,
                     alignItems: 'center',
                     borderWidth: active ? 0 : 1,
-                    borderColor: 'rgba(0,65,47,0.12)',
+                    borderColor: withAlpha(C.green, 0.12),
                   }}
                 >
                   <Text style={{ fontSize: 11, fontWeight: '700', color: active ? C.beige : C.dark }}>

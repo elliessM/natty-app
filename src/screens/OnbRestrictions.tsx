@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import TopNav from '../shared/TopNav';
 import { btnDark, btnDarkLabel, btnSkip, btnSkipLabel } from '../shared/Buttons';
 import { useUserStore } from '../store/useUserStore';
@@ -62,9 +62,9 @@ export default function OnbRestrictions() {
                   paddingVertical: 14,
                   paddingHorizontal: 22,
                   borderRadius: 999,
-                  backgroundColor: isSel ? C.green : 'rgba(252,233,218,0.5)',
+                  backgroundColor: isSel ? C.green : withAlpha(C.beige, 0.5),
                   borderWidth: isSel ? 0 : 1.5,
-                  borderColor: 'rgba(0,65,47,0.25)',
+                  borderColor: withAlpha(C.green, 0.25),
                 }}
               >
                 <Text style={{ color: isSel ? C.beige : C.dark, fontWeight: isSel ? '700' : '500', fontSize: 13 }}>{o.t}</Text>
@@ -78,9 +78,9 @@ export default function OnbRestrictions() {
             marginTop: 28,
             padding: 16,
             borderRadius: 18,
-            backgroundColor: 'rgba(0,65,47,0.06)',
+            backgroundColor: withAlpha(C.green, 0.06),
             borderWidth: 1,
-            borderColor: 'rgba(0,65,47,0.1)',
+            borderColor: withAlpha(C.green, 0.1),
             flexDirection: 'row',
             gap: 12,
             alignItems: 'center',
@@ -98,7 +98,7 @@ export default function OnbRestrictions() {
         <View style={{ flex: 1 }} />
 
         <View style={{ marginTop: 32, alignItems: 'center' }}>
-          <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: 'rgba(190,211,92,0.25)', overflow: 'hidden' }}>
+          <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: withAlpha(C.lime, 0.25), overflow: 'hidden' }}>
             <View style={{ width: `${(6 / 7) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
           </View>
           <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>6 / 7</Text>

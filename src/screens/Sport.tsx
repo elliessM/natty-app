@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, Modal, TextInput, Alert, Platform } 
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
-import { C, F, softShadow, cardShadow } from '../tokens';
+import { C, F, softShadow, cardShadow, withAlpha } from '../tokens';
 import { hapticLight, hapticSelection, hapticSuccess } from '../shared/haptics';
 import { btnDark, btnDarkLabel } from '../shared/Buttons';
 import { useUserStore } from '../store/useUserStore';
@@ -103,8 +103,8 @@ export default function Sport() {
             overflow: 'hidden',
           }}
         >
-          <View style={{ position: 'absolute', right: -50, top: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(190,211,92,0.18)' }} />
-          <View style={{ position: 'absolute', left: -40, bottom: -60, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(237,126,0,0.12)' }} />
+          <View style={{ position: 'absolute', right: -50, top: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: withAlpha(C.lime, 0.18) }} />
+          <View style={{ position: 'absolute', left: -40, bottom: -60, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.orange, 0.12) }} />
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 18 }}>
             {/* Anneau pas */}
@@ -152,7 +152,8 @@ export default function Sport() {
           <Pressable
             onPress={() => {
               hapticLight();
-              navigation.navigate('Fasting');
+              // Fasting vit dans le HomeStack d'un autre onglet : il faut passer par le tab navigator.
+              navigation.getParent()?.navigate('HomeTab', { screen: 'Fasting' });
             }}
             style={({ pressed }) => ({
               padding: 16,
@@ -172,7 +173,7 @@ export default function Sport() {
                 width: 52,
                 height: 52,
                 borderRadius: 26,
-                backgroundColor: fastingStartTs ? 'rgba(237,126,0,0.15)' : 'rgba(0,65,47,0.08)',
+                backgroundColor: fastingStartTs ? withAlpha(C.orange, 0.15) : withAlpha(C.green, 0.08),
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -271,7 +272,7 @@ export default function Sport() {
                         width: 44,
                         height: 44,
                         borderRadius: 12,
-                        backgroundColor: 'rgba(190,211,92,0.22)',
+                        backgroundColor: withAlpha(C.lime, 0.22),
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
@@ -336,12 +337,12 @@ function MetricChip({ label, value, accent }: { label: string; value: string; ac
     <View
       style={{
         flex: 1,
-        backgroundColor: accent ? 'rgba(237,126,0,0.25)' : 'rgba(252,233,218,0.12)',
+        backgroundColor: accent ? withAlpha(C.orange, 0.25) : withAlpha(C.beige, 0.12),
         borderRadius: 12,
         paddingVertical: 10,
         paddingHorizontal: 10,
         borderWidth: accent ? 1 : 0,
-        borderColor: 'rgba(237,126,0,0.4)',
+        borderColor: withAlpha(C.orange, 0.4),
       }}
     >
       <Text style={{ fontSize: 9, letterSpacing: 1.5, color: accent ? C.orange : C.lime, opacity: accent ? 1 : 0.8, fontWeight: '700' }}>
@@ -459,7 +460,7 @@ function AddWorkoutSheet({
                     borderRadius: 999,
                     backgroundColor: active ? C.green : C.white,
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.15)',
+                    borderColor: withAlpha(C.green, 0.15),
                   }}
                 >
                   <Text style={{ fontSize: 14 }}>{meta.emoji}</Text>
@@ -531,9 +532,9 @@ function AddWorkoutSheet({
               marginTop: 14,
               padding: 14,
               borderRadius: 14,
-              backgroundColor: 'rgba(237,126,0,0.1)',
+              backgroundColor: withAlpha(C.orange, 0.1),
               borderWidth: 1,
-              borderColor: 'rgba(237,126,0,0.25)',
+              borderColor: withAlpha(C.orange, 0.25),
               flexDirection: 'row',
               alignItems: 'center',
               gap: 12,

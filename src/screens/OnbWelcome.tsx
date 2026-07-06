@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import Ambience from '../shared/Ambience';
 import { btnPrimary, btnPrimaryLabel } from '../shared/Buttons';
 import type { OnboardingStackParamList } from '../navigation/types';
@@ -75,9 +75,9 @@ export default function OnbWelcome() {
                 gap: 12,
                 paddingVertical: 12,
                 paddingHorizontal: 14,
-                backgroundColor: 'rgba(252,233,218,0.06)',
+                backgroundColor: withAlpha(C.beige, 0.06),
                 borderWidth: 1,
-                borderColor: 'rgba(252,233,218,0.12)',
+                borderColor: withAlpha(C.beige, 0.12),
                 borderRadius: 14,
               }}
             >
@@ -86,7 +86,7 @@ export default function OnbWelcome() {
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: 'rgba(190,211,92,0.18)',
+                  backgroundColor: withAlpha(C.lime, 0.18),
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}

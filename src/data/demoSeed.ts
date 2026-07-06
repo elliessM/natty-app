@@ -1,8 +1,9 @@
-import { useUserStore } from '../store/useUserStore';
+import { useUserStore, todayKey } from '../store/useUserStore';
 import { useJournalStore, type JournalEntry } from '../store/useJournalStore';
 import { useReservationsStore } from '../store/useReservationsStore';
 import { useCartStore } from '../store/useCartStore';
 import { PRODUCTS } from './products';
+import { uuidv4 } from '../shared/uuid';
 
 /**
  * Seed démo — remplit profil, journal, hydratation et réservations avec un set
@@ -79,7 +80,7 @@ function buildJournalEntries(): JournalEntry[] {
     const base = startOfDay(dayOffset).getTime();
     day.forEach((m) => {
       entries.push({
-        id: `demo-${dayOffset}-${m.minutes}-${Math.random().toString(36).slice(2, 6)}`,
+        id: uuidv4(),
         source: m.source,
         timestamp: base + m.minutes * 60_000,
         food: m.food,
@@ -102,7 +103,7 @@ function buildReservations() {
 
   return [
     {
-      id: `demo-resa-upcoming-${Date.now()}`,
+      id: uuidv4(),
       items: [
         { ...PRODUCTS[0], qty: 1 },
         { ...PRODUCTS[1], qty: 2 },
@@ -113,11 +114,10 @@ function buildReservations() {
       pickupTimestamp: tomorrow.getTime(),
       total: PRODUCTS[0].price + PRODUCTS[1].price * 2,
       createdAt: Date.now() - 3600_000,
-      paymentTiming: 'now' as const,
       paidAt: Date.now() - 3600_000,
     },
     {
-      id: `demo-resa-past-${Date.now()}`,
+      id: uuidv4(),
       items: [{ ...PRODUCTS[2], qty: 1 }],
       fridgeId: 'fcnation',
       fridgeName: 'Fitness Club Nation',
@@ -126,7 +126,6 @@ function buildReservations() {
       total: PRODUCTS[2].price,
       createdAt: yest.getTime() - 7200_000,
       completedAt: yest.getTime() + 600_000,
-      paymentTiming: 'now' as const,
       paidAt: yest.getTime() - 7200_000,
     },
   ];
@@ -147,7 +146,8 @@ function buildWeightHistory(): Array<{ date: string; kg: number }> {
   ];
   return points.map((p) => {
     const d = startOfDay(p.offset);
-    return { date: d.toISOString().slice(0, 10), kg: p.kg };
+    const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return { date, kg: p.kg };
   });
 }
 
@@ -167,7 +167,7 @@ export function seedDemoData() {
     macroPct: 0.78,
     hasOnboarded: true,
     hydrationMl: 1500,
-    hydrationDay: new Date().toISOString().slice(0, 10),
+    hydrationDay: todayKey(),
     creditsEur: 12.5,
     notificationsEnabled: true,
     weightHistory: buildWeightHistory(),

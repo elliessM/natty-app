@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import Ambience from '../shared/Ambience';
 import OnboardingProgress from '../shared/OnboardingProgress';
 import { btnPrimary, btnPrimaryLabel } from '../shared/Buttons';
@@ -74,15 +74,15 @@ export default function OnbReady() {
         <View
           style={{
             marginTop: 22,
-            backgroundColor: 'rgba(252,233,218,0.08)',
+            backgroundColor: withAlpha(C.beige, 0.08),
             borderWidth: 1,
-            borderColor: 'rgba(252,233,218,0.18)',
+            borderColor: withAlpha(C.beige, 0.18),
             borderRadius: 22,
             padding: 18,
             overflow: 'hidden',
           }}
         >
-          <View style={{ position: 'absolute', right: -30, top: -30, width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(190,211,92,0.12)' }} />
+          <View style={{ position: 'absolute', right: -30, top: -30, width: 120, height: 120, borderRadius: 60, backgroundColor: withAlpha(C.lime, 0.12) }} />
 
           <Text style={{ fontSize: 10, letterSpacing: 3, color: C.lime, fontWeight: '700' }}>OBJECTIF QUOTIDIEN</Text>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 6 }}>
@@ -104,9 +104,9 @@ export default function OnbReady() {
         <View
           style={{
             marginTop: 14,
-            backgroundColor: 'rgba(252,233,218,0.08)',
+            backgroundColor: withAlpha(C.beige, 0.08),
             borderWidth: 1,
-            borderColor: 'rgba(252,233,218,0.12)',
+            borderColor: withAlpha(C.beige, 0.12),
             borderRadius: 18,
             paddingVertical: 6,
             paddingHorizontal: 16,
@@ -142,7 +142,7 @@ function Row({ label, value, last }: { label: string; value: string; last?: bool
         alignItems: 'center',
         paddingVertical: 10,
         borderBottomWidth: last ? 0 : 1,
-        borderColor: 'rgba(252,233,218,0.1)',
+        borderColor: withAlpha(C.beige, 0.1),
       }}
     >
       <Text style={{ fontSize: 12, color: C.beige, opacity: 0.7 }}>{label}</Text>
@@ -153,7 +153,7 @@ function Row({ label, value, last }: { label: string; value: string; last?: bool
 
 function Macro({ color, label, value }: { color: string; label: string; value: string }) {
   return (
-    <View style={{ flex: 1, padding: 10, borderRadius: 12, backgroundColor: 'rgba(252,233,218,0.08)' }}>
+    <View style={{ flex: 1, padding: 10, borderRadius: 12, backgroundColor: withAlpha(C.beige, 0.08) }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
         <Text style={{ fontSize: 9, fontWeight: '700', color: C.lime, letterSpacing: 1 }}>{label.toUpperCase()}</Text>

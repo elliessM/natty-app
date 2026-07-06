@@ -4,12 +4,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-import { C, F, softShadow } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import { IconBack } from '../shared/Icons';
 import { hapticLight, hapticSelection } from '../shared/haptics';
 import {
   useJournalStore,
   dayKey,
+  parseDayKey,
   entriesForDay,
   dayTotals,
   formatTime,
@@ -22,7 +23,7 @@ import type { HomeStackParamList } from '../navigation/types';
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Journal'>;
 
 function shiftDay(key: string, delta: number): string {
-  const d = new Date(key);
+  const d = parseDayKey(key);
   d.setDate(d.getDate() + delta);
   return dayKey(d.getTime());
 }
@@ -169,8 +170,8 @@ export default function Journal() {
             overflow: 'hidden',
           }}
         >
-          <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(237,126,0,0.18)' }} />
-          <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(190,211,92,0.12)' }} />
+          <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.orange, 0.18) }} />
+          <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.lime, 0.12) }} />
 
           <Text style={{ fontSize: 10, letterSpacing: 3, color: C.lime, fontWeight: '700' }}>TOTAL DU JOUR</Text>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 6, gap: 8 }}>
@@ -184,7 +185,7 @@ export default function Journal() {
           <View style={{ marginTop: 18, gap: 10 }}>
             <MacroBar label="Protéines" value={totals.prot} target={targets.prot} unit="g" color={C.lime} />
             <MacroBar label="Glucides" value={totals.glu} target={targets.glu} unit="g" color={C.orange} />
-            <MacroBar label="Lipides" value={totals.lip} target={targets.lip} unit="g" color={C.beige} />
+            <MacroBar label="Lipides" value={totals.lip} target={targets.lip} unit="g" color={C.lipid} />
           </View>
         </View>
 
@@ -254,7 +255,7 @@ export default function Journal() {
                       width: 44,
                       height: 44,
                       borderRadius: 12,
-                      backgroundColor: e.source === 'scan' ? 'rgba(237,126,0,0.15)' : 'rgba(190,211,92,0.2)',
+                      backgroundColor: e.source === 'scan' ? withAlpha(C.orange, 0.15) : withAlpha(C.lime, 0.2),
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
@@ -304,7 +305,7 @@ export default function Journal() {
                     hitSlop={10}
                     style={{ marginLeft: 6, padding: 4 }}
                   >
-                    <Text style={{ fontSize: 18, color: fav ? C.orange : '#d8d2c8' }}>{fav ? '★' : '☆'}</Text>
+                    <Text style={{ fontSize: 18, color: fav ? C.orange : C.line }}>{fav ? '★' : '☆'}</Text>
                   </Pressable>
                 </Pressable>
               );
@@ -330,7 +331,7 @@ function MacroBar({ label, value, target, unit, color }: { label: string; value:
           {Math.round(value)} / {target} {unit}
         </Text>
       </View>
-      <View style={{ height: 5, borderRadius: 3, backgroundColor: 'rgba(252,233,218,0.15)', overflow: 'hidden' }}>
+      <View style={{ height: 5, borderRadius: 3, backgroundColor: withAlpha(C.beige, 0.15), overflow: 'hidden' }}>
         <View style={{ width: `${pct * 100}%`, height: '100%', backgroundColor: color, borderRadius: 3 }} />
       </View>
     </View>

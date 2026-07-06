@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, softShadow } from '../tokens';
+import { C, softShadow, withAlpha } from '../tokens';
 import { IconBack } from './Icons';
 
 type Props = { onBack?: () => void; stepText?: string };
@@ -42,7 +42,7 @@ export default function TopNav({ onBack, stepText }: Props) {
             borderRadius: 12,
             backgroundColor: C.white,
             borderWidth: 1,
-            borderColor: 'rgba(190,211,92,0.6)',
+            borderColor: withAlpha(C.lime, 0.6),
           }}
         >
           <Text style={{ fontSize: 11, fontWeight: '700', color: C.green }}>{stepText}</Text>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import { C } from '../tokens';
+import { C, withAlpha } from '../tokens';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -12,9 +12,9 @@ export default function MacroRings({ size = 168, values = [78, 72, 60], thicknes
   const cy = size / 2;
   // Tighter ring stack: 9px thick, 4px gap between rings → more room in the center for text.
   const rings = [
-    { r: size / 2 - 6, color: C.orange, bg: 'rgba(237,126,0,0.18)', v: values[0] },
-    { r: size / 2 - 19, color: C.lime, bg: 'rgba(190,211,92,0.2)', v: values[1] },
-    { r: size / 2 - 32, color: C.beige, bg: 'rgba(252,233,218,0.15)', v: values[2] },
+    { r: size / 2 - 6, color: C.orange, bg: withAlpha(C.orange, 0.18), v: values[0] },
+    { r: size / 2 - 19, color: C.lime, bg: withAlpha(C.lime, 0.2), v: values[1] },
+    { r: size / 2 - 32, color: C.beige, bg: withAlpha(C.beige, 0.15), v: values[2] },
   ];
 
   const anims = useRef(rings.map(() => new Animated.Value(0))).current;

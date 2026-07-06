@@ -55,7 +55,7 @@ export default function BarChart7Days({ data, goal, height = 160, showLabels = t
           const y = padTop + innerH - barH;
           const reached = d.value >= goal;
           const close = !reached && d.value >= goal * 0.7;
-          const color = d.value === 0 ? C.beige2 : reached ? C.orange : close ? C.lime : '#d8d2c8';
+          const color = d.value === 0 ? C.beige2 : reached ? C.orange : close ? C.lime : C.line;
 
           return (
             <React.Fragment key={i}>

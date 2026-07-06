@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import TopNav from '../shared/TopNav';
 import OnboardingProgress from '../shared/OnboardingProgress';
 import { btnDark, btnDarkLabel } from '../shared/Buttons';
@@ -116,9 +116,9 @@ export default function OnbMeasurements() {
               marginTop: 16,
               padding: 14,
               borderRadius: 14,
-              backgroundColor: 'rgba(0,65,47,0.06)',
+              backgroundColor: withAlpha(C.green, 0.06),
               borderWidth: 1,
-              borderColor: 'rgba(0,65,47,0.1)',
+              borderColor: withAlpha(C.green, 0.1),
               flexDirection: 'row',
               gap: 10,
               alignItems: 'flex-start',

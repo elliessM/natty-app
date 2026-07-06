@@ -100,7 +100,7 @@ export default function AchatS2() {
                   <Text style={{ fontSize: 11, color: C.green }}>● {p.kcal} kcal</Text>
                   <Text style={{ fontSize: 11, color: C.green }}>● {p.prot}g prot</Text>
                 </View>
-                <Text style={{ fontWeight: '700', fontSize: 14, color: C.dark, marginTop: 4 }}>{formatPrice(p.price * p.qty)} EUR</Text>
+                <Text style={{ fontWeight: '700', fontSize: 14, color: C.dark, marginTop: 4 }}>{formatPrice(p.price * p.qty)} €</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: C.beige, padding: 4, borderRadius: 20 }}>
                 <Pressable onPress={() => decrementItem(p.id)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center' }}>
@@ -153,9 +153,9 @@ export default function AchatS2() {
         <Text style={{ paddingHorizontal: 20, marginTop: 30, fontSize: 13, fontWeight: '700', color: C.green }}>Détail paiement</Text>
         <View style={{ marginHorizontal: 16, marginTop: 12, backgroundColor: C.white, borderRadius: 20, padding: 16, paddingHorizontal: 20, ...cardShadow }}>
           {[
-            ['Sous-total', `${formatPrice(subtotal)} EUR`],
-            ['Frais de service', `${formatPrice(fees)} EUR`],
-            ['Réduction Club (−5 %)', `${formatPrice(discount)} EUR`],
+            ['Sous-total', `${formatPrice(subtotal)} €`],
+            ['Frais de service', `${formatPrice(fees)} €`],
+            ['Réduction Club (−5 %)', `${formatPrice(discount)} €`],
           ].map((r, i) => (
             <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }}>
               <Text style={{ fontSize: 13, color: C.darkSoft }}>{r[0]}</Text>
@@ -167,7 +167,7 @@ export default function AchatS2() {
             <Text style={{ fontSize: 14, fontWeight: '700', color: C.dark }}>Total TTC</Text>
             <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
               <Text style={{ fontFamily: F.display, fontSize: 28, fontWeight: '900', color: C.green }}>{formatPrice(total)} </Text>
-              <Text style={{ fontSize: 13, color: C.darkSoft }}>EUR</Text>
+              <Text style={{ fontSize: 13, color: C.darkSoft }}>€</Text>
             </View>
           </View>
         </View>
@@ -206,7 +206,7 @@ export default function AchatS2() {
             elevation: 6,
           }}
         >
-          <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>Payer · {formatPrice(total)} EUR →</Text>
+          <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>Payer · {formatPrice(total)} € →</Text>
         </Pressable>
       </View>
     </View>

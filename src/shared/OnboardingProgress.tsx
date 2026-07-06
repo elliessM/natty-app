@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { C } from '../tokens';
+import { C, withAlpha } from '../tokens';
 
 type Props = { step: number; total: number; tone?: 'light' | 'dark' };
 
@@ -10,7 +10,7 @@ type Props = { step: number; total: number; tone?: 'light' | 'dark' };
  */
 export default function OnboardingProgress({ step, total, tone = 'light' }: Props) {
   const onDark = tone === 'dark';
-  const trackBg = onDark ? 'rgba(190,211,92,0.25)' : 'rgba(0,65,47,0.12)';
+  const trackBg = onDark ? withAlpha(C.lime, 0.25) : withAlpha(C.green, 0.12);
   const labelColor = onDark ? C.lime : C.green;
 
   return (

@@ -13,8 +13,8 @@ create table public.profiles (
   age int not null default 28 check (age between 12 and 100),
   sex text not null default 'M' check (sex in ('M','F','other')),
   height_cm int not null default 178 check (height_cm between 120 and 230),
-  weight_kg int not null default 75 check (weight_kg between 30 and 200),
-  target_weight_kg int not null default 72 check (target_weight_kg between 30 and 200),
+  weight_kg numeric(5,1) not null default 75 check (weight_kg between 30 and 200),
+  target_weight_kg numeric(5,1) not null default 72 check (target_weight_kg between 30 and 200),
   activity_level text not null default 'active' check (activity_level in ('sedentary','light','active','athlete')),
   has_onboarded boolean not null default false,
   updated_at timestamptz not null default now()
@@ -92,30 +92,6 @@ create policy "journal_delete_own"
   on public.journal_entries for delete
   using (auth.uid() = user_id);
 
--- ─── hydration_logs ──────────────────────────────────────────────
-create table public.hydration_logs (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  day date not null,
-  ml int not null default 0 check (ml >= 0),
-  updated_at timestamptz not null default now(),
-  unique (user_id, day)
-);
-
-alter table public.hydration_logs enable row level security;
-
-create policy "hydration_select_own"
-  on public.hydration_logs for select
-  using (auth.uid() = user_id);
-
-create policy "hydration_upsert_own"
-  on public.hydration_logs for insert
-  with check (auth.uid() = user_id);
-
-create policy "hydration_update_own"
-  on public.hydration_logs for update
-  using (auth.uid() = user_id);
-
 -- ─── reservations ────────────────────────────────────────────────
 create table public.reservations (
   id uuid primary key default gen_random_uuid(),
@@ -126,6 +102,7 @@ create table public.reservations (
   fridge_addr text not null,
   pickup_ts timestamptz not null,
   total numeric not null,
+  paid_at timestamptz,
   cancelled_at timestamptz,
   completed_at timestamptz,
   created_at timestamptz not null default now()

@@ -5,7 +5,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import StatusBar from '../shared/StatusBar';
 import HomeIndicator from '../shared/HomeIndicator';
 import { IconBack, IconCheck } from '../shared/Icons';
@@ -21,7 +21,7 @@ type Nav = NativeStackNavigationProp<MapStackParamList, 'AchatS3'>;
 const METHODS = [
   { id: 'applepay', t: 'Apple Pay', s: '•••• 4 821', e: '' },
   { id: 'card', t: 'Carte Visa', s: '•••• 1 234', e: '💳' },
-  { id: 'crypto', t: 'Natty Credits', s: 'Solde : 42,80 EUR', e: '⚡' },
+  { id: 'crypto', t: 'Natty Credits', s: 'Solde : 42,80 €', e: '⚡' },
 ];
 
 export default function AchatS3() {
@@ -60,7 +60,6 @@ export default function AchatS3() {
           fridgeAddr: fridge.addr,
           pickupTimestamp: pickupAt,
           total,
-          paymentTiming: 'now',
           paidAt: Date.now(),
         });
         hapticSuccess();
@@ -107,11 +106,11 @@ export default function AchatS3() {
         end={{ x: 1, y: 1 }}
         style={{ position: 'absolute', left: 16, right: 16, top: backTop + 70, borderRadius: 24, padding: 24, overflow: 'hidden' }}
       >
-        <View style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(190,211,92,0.15)' }} />
+        <View style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.lime, 0.15) }} />
         <Text style={{ fontSize: 11, letterSpacing: 3, color: C.lime, fontWeight: '700' }}>TOTAL À PAYER</Text>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 6 }}>
           <Text style={{ fontFamily: F.display, fontSize: 56, fontWeight: '900', color: C.beige, letterSpacing: -1 }}>{formatPrice(total)}</Text>
-          <Text style={{ fontSize: 20, marginLeft: 6, color: C.beige, opacity: 0.7 }}>EUR</Text>
+          <Text style={{ fontSize: 20, marginLeft: 6, color: C.beige, opacity: 0.7 }}>€</Text>
         </View>
         <Text style={{ fontSize: 12, color: C.lime, opacity: 0.8, marginTop: 2 }}>
           {display.length} article{display.length > 1 ? 's' : ''} · Club −5%
@@ -139,10 +138,10 @@ export default function AchatS3() {
                 borderRadius: 18,
                 backgroundColor: active ? C.green : C.white,
                 borderWidth: active ? 0 : 1.5,
-                borderColor: 'rgba(0,65,47,0.15)',
+                borderColor: withAlpha(C.green, 0.15),
               }}
             >
-              <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: active ? 'rgba(252,233,218,0.2)' : C.beige, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: active ? withAlpha(C.beige, 0.2) : C.beige, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 20 }}>{p.e}</Text>
               </View>
               <View style={{ flex: 1 }}>
@@ -159,7 +158,7 @@ export default function AchatS3() {
         })}
       </View>
 
-      <View style={{ position: 'absolute', left: 16, right: 16, bottom: insets.bottom + 92, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: 'rgba(0,65,47,0.06)', borderRadius: 14, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+      <View style={{ position: 'absolute', left: 16, right: 16, bottom: insets.bottom + 92, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: withAlpha(C.green, 0.06), borderRadius: 14, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
         <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.lime, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 16 }}>🔒</Text>
         </View>
@@ -196,7 +195,7 @@ export default function AchatS3() {
               <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>Paiement en cours...</Text>
             </>
           ) : (
-            <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>🔒 Payer · {formatPrice(total)} EUR</Text>
+            <Text style={{ color: C.beige, fontWeight: '700', fontSize: 16 }}>🔒 Payer · {formatPrice(total)} €</Text>
           )}
         </Pressable>
       </View>

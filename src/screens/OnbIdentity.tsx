@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import TopNav from '../shared/TopNav';
 import OnboardingProgress from '../shared/OnboardingProgress';
 import { btnDark, btnDarkLabel } from '../shared/Buttons';
@@ -161,7 +161,7 @@ export default function OnbIdentity() {
                     backgroundColor: active ? C.green : C.white,
                     alignItems: 'center',
                     borderWidth: active ? 0 : 1.5,
-                    borderColor: 'rgba(0,65,47,0.15)',
+                    borderColor: withAlpha(C.green, 0.15),
                   }}
                 >
                   <Text style={{ color: active ? C.beige : C.dark, fontSize: 13, fontWeight: active ? '700' : '500' }}>

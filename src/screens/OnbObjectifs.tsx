@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import TopNav from '../shared/TopNav';
 import { btnDark, btnDarkLabel, optionCard } from '../shared/Buttons';
 import { IconCheck } from '../shared/Icons';
@@ -61,7 +61,7 @@ export default function OnbObjectifs() {
                     width: 36,
                     height: 36,
                     borderRadius: 18,
-                    backgroundColor: isSel ? 'rgba(252,233,218,0.2)' : `${g.c}2e`,
+                    backgroundColor: isSel ? withAlpha(C.beige, 0.2) : `${g.c}2e`,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
@@ -94,7 +94,7 @@ export default function OnbObjectifs() {
         <View style={{ flex: 1 }} />
 
         <View style={{ marginTop: 32, alignItems: 'center' }}>
-          <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: 'rgba(190,211,92,0.25)', overflow: 'hidden' }}>
+          <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: withAlpha(C.lime, 0.25), overflow: 'hidden' }}>
             <View style={{ width: `${(2 / 7) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
           </View>
           <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>2 / 7</Text>

@@ -2,10 +2,9 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { CartItem } from '../types';
+import { uuidv4, isUuid } from '../shared/uuid';
 
 export type ReservationStatus = 'pending' | 'ready' | 'past' | 'cancelled';
-
-export type PaymentTiming = 'now' | 'pickup';
 
 export type Reservation = {
   id: string;
@@ -18,8 +17,7 @@ export type Reservation = {
   createdAt: number;
   cancelledAt?: number;
   completedAt?: number;
-  paymentTiming: PaymentTiming;
-  paidAt?: number; // timestamp paiement effectif (immédiat ou différé)
+  paidAt?: number; // timestamp paiement effectif — toujours réglé avant retrait
 };
 
 type ReservationsState = {
@@ -36,7 +34,7 @@ export const useReservationsStore = create<ReservationsState>()(
     (set) => ({
       reservations: [],
       createReservation: (r) => {
-        const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const id = uuidv4();
         set((s) => ({
           reservations: [...s.reservations, { ...r, id, createdAt: Date.now() }],
         }));
@@ -61,6 +59,17 @@ export const useReservationsStore = create<ReservationsState>()(
     {
       name: 'natty.reservations',
       storage: createJSONStorage(() => AsyncStorage),
+      version: 1,
+      // v0 → v1 : ids locaux non-uuid rejetés par Supabase + suppression du paymentTiming (plus de "payer plus tard")
+      migrate: (persisted: any) => {
+        if (Array.isArray(persisted?.reservations)) {
+          persisted.reservations = persisted.reservations.map((r: any) => {
+            const { paymentTiming, ...rest } = r;
+            return isUuid(rest.id) ? rest : { ...rest, id: uuidv4() };
+          });
+        }
+        return persisted;
+      },
     }
   )
 );

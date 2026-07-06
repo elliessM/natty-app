@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, Modal, ScrollView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import { hapticSelection, hapticMedium } from './haptics';
 
 // Créneaux pré-définis : 9h → 21h tous les 30 min (en minutes depuis minuit).
@@ -131,7 +131,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
           ...cardShadow,
         }}
       >
-        <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#e0e0e0', marginBottom: 14 }} />
+        <View style={{ alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: C.line, marginBottom: 14 }} />
 
         <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.dark, lineHeight: 24 }}>
           {title ?? 'Programmer ma commande'}
@@ -157,7 +157,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
                   borderRadius: 999,
                   backgroundColor: active ? C.green : C.beige,
                   borderWidth: active ? 0 : 1.5,
-                  borderColor: 'rgba(0,65,47,0.15)',
+                  borderColor: withAlpha(C.green, 0.15),
                 }}
               >
                 <Text style={{ color: active ? C.beige : C.dark, fontSize: 13, fontWeight: active ? '700' : '500' }}>
@@ -191,7 +191,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
                   borderRadius: 12,
                   backgroundColor: past ? '#f0eae2' : active ? C.orange : C.beige,
                   borderWidth: active ? 0 : 1.5,
-                  borderColor: active ? C.orange : 'rgba(0,65,47,0.12)',
+                  borderColor: active ? C.orange : withAlpha(C.green, 0.12),
                   alignItems: 'center',
                   opacity: past ? 0.35 : 1,
                 }}
@@ -230,7 +230,7 @@ export default function TimeSlotPickerModal({ visible, onClose, onConfirm, title
               borderRadius: 14,
               backgroundColor: customTs != null ? C.orange : C.beige,
               borderWidth: customTs != null ? 0 : 1.5,
-              borderColor: 'rgba(0,65,47,0.12)',
+              borderColor: withAlpha(C.green, 0.12),
               alignItems: 'center',
               flexDirection: 'row',
               justifyContent: 'center',

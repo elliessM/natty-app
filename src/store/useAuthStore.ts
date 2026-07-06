@@ -25,8 +25,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   error: null,
 
   bootstrap: async () => {
-    const { data } = await supabase.auth.getSession();
-    set({ session: data.session, user: data.session?.user ?? null, loading: false });
+    try {
+      const { data } = await supabase.auth.getSession();
+      set({ session: data.session, user: data.session?.user ?? null });
+    } catch {
+      // Réseau KO : on démarre déconnecté plutôt que de bloquer le splash.
+      set({ session: null, user: null });
+    } finally {
+      set({ loading: false });
+    }
     supabase.auth.onAuthStateChange((_event, session) => {
       set({ session, user: session?.user ?? null });
     });

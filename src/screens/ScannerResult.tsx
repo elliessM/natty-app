@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
-import { C, F, cardShadow } from '../tokens';
+import { C, F, cardShadow, withAlpha } from '../tokens';
 import SmartImage from '../shared/SmartImage';
 import { SCANNER_DEFAULT_IMAGE } from '../data/images';
 import { useScanStore, type ScanCandidate } from '../store/useScanStore';
@@ -38,7 +38,7 @@ export default function ScannerResult() {
     { l: 'Calories', v: r.kcal, u: 'kcal', c: C.orange, pct: 0.24 },
     { l: 'Protéines', v: r.prot, u: 'g', c: C.lime, pct: 0.32 },
     { l: 'Glucides', v: r.glu, u: 'g', c: C.green, pct: 0.23 },
-    { l: 'Lipides', v: r.lip, u: 'g', c: '#d4a574', pct: 0.18 },
+    { l: 'Lipides', v: r.lip, u: 'g', c: C.lipid, pct: 0.18 },
   ];
 
   const closeModal = () => navigation.getParent()?.goBack();
@@ -88,8 +88,8 @@ export default function ScannerResult() {
           end={{ x: 1, y: 1 }}
           style={{ height: 280, overflow: 'hidden' }}
         >
-          <View style={{ position: 'absolute', right: -60, top: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(237,126,0,0.2)' }} />
-          <View style={{ position: 'absolute', left: -50, bottom: -50, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.2)' }} />
+          <View style={{ position: 'absolute', right: -60, top: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: withAlpha(C.orange, 0.2) }} />
+          <View style={{ position: 'absolute', left: -50, bottom: -50, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.lime, 0.2) }} />
           <Pressable
             onPress={() => navigation.goBack()}
             accessibilityLabel="Rescanner"
@@ -203,14 +203,14 @@ export default function ScannerResult() {
                   <Text style={{ fontFamily: F.display, fontSize: 20, fontWeight: '900', color: C.dark }}>{m.v}</Text>
                   <Text style={{ fontSize: 10, color: C.darkSoft }}>{m.u}</Text>
                 </View>
-                <View style={{ height: 4, backgroundColor: 'rgba(0,65,47,0.1)', borderRadius: 2, marginTop: 6, overflow: 'hidden' }}>
+                <View style={{ height: 4, backgroundColor: withAlpha(C.green, 0.1), borderRadius: 2, marginTop: 6, overflow: 'hidden' }}>
                   <View style={{ height: '100%', width: `${m.pct * 100}%`, backgroundColor: m.c, borderRadius: 2 }} />
                 </View>
               </View>
             ))}
           </View>
 
-          <View style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: 'rgba(190,211,92,0.2)', borderRadius: 14, flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
+          <View style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: withAlpha(C.lime, 0.2), borderRadius: 14, flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
             <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ color: C.lime, fontWeight: '700', fontFamily: F.display }}>N</Text>
             </View>

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow, cardShadow } from '../tokens';
+import { C, F, softShadow, cardShadow, withAlpha } from '../tokens';
 import { IconBack, IconPin, IconClock } from '../shared/Icons';
 import {
   useReservationsStore,
@@ -85,8 +85,8 @@ export default function Reservations() {
               end={{ x: 1, y: 1 }}
               style={{ borderRadius: 22, padding: 28, alignItems: 'center', overflow: 'hidden' }}
             >
-              <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.15)' }} />
-              <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(237,126,0,0.18)' }} />
+              <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.lime, 0.15) }} />
+              <View style={{ position: 'absolute', left: -30, bottom: -50, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.orange, 0.18) }} />
               <Text style={{ fontSize: 56 }}>📦</Text>
               <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.beige, textAlign: 'center', marginTop: 12, lineHeight: 26 }}>
                 Réserve ton repas{'\n'}avant la séance
@@ -237,11 +237,11 @@ function ReservationCard({
               paddingVertical: 10,
               borderRadius: 999,
               borderWidth: 1.5,
-              borderColor: '#c44',
+              borderColor: C.danger,
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: '#c44', fontWeight: '700', fontSize: 12 }}>Annuler</Text>
+            <Text style={{ color: C.danger, fontWeight: '700', fontSize: 12 }}>Annuler</Text>
           </Pressable>
           {isReady ? (
             <View

@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, F } from '../tokens';
+import { C, F, withAlpha } from '../tokens';
 import TopNav from '../shared/TopNav';
 import OnboardingProgress from '../shared/OnboardingProgress';
 import { btnDark, btnDarkLabel } from '../shared/Buttons';
@@ -22,7 +22,7 @@ const LEVELS: Array<{
   desc: string;
   color: string;
 }> = [
-  { id: 'sedentary', emoji: '🪑', title: 'Sédentaire', desc: 'Travail de bureau, peu de sport', color: '#d4a574' },
+  { id: 'sedentary', emoji: '🪑', title: 'Sédentaire', desc: 'Travail de bureau, peu de sport', color: C.lipid },
   { id: 'light', emoji: '🚶', title: 'Peu actif', desc: '1-3 séances ou marche quotidienne', color: C.lime },
   { id: 'active', emoji: '🏃', title: 'Actif', desc: '3-5 séances soutenues / semaine', color: C.green },
   { id: 'athlete', emoji: '🔥', title: 'Athlète', desc: '6-7 séances ou double séance', color: C.orange },
@@ -68,7 +68,7 @@ export default function OnbActivity() {
                   borderRadius: 18,
                   backgroundColor: active ? l.color : C.white,
                   borderWidth: active ? 0 : 1.5,
-                  borderColor: 'rgba(0,65,47,0.15)',
+                  borderColor: withAlpha(C.green, 0.15),
                 }}
               >
                 <View
@@ -76,7 +76,7 @@ export default function OnbActivity() {
                     width: 44,
                     height: 44,
                     borderRadius: 14,
-                    backgroundColor: active ? 'rgba(252,233,218,0.25)' : `${l.color}33`,
+                    backgroundColor: active ? withAlpha(C.beige, 0.25) : `${l.color}33`,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}

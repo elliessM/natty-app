@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, Share, FlatList } from 'react-native
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import { IconBack } from '../shared/Icons';
 import { useUserStore, computeMacroTargets } from '../store/useUserStore';
 import { useJournalStore, dayKey } from '../store/useJournalStore';
@@ -34,22 +34,24 @@ export default function Social() {
     <View style={{ flex: 1, backgroundColor: C.beige }}>
       {/* Header */}
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 16, paddingBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Retour"
-          hitSlop={12}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: C.white,
-            alignItems: 'center',
-            justifyContent: 'center',
-            ...softShadow,
-          }}
-        >
-          <IconBack />
-        </Pressable>
+        {navigation.canGoBack() ? (
+          <Pressable
+            onPress={() => navigation.goBack()}
+            accessibilityLabel="Retour"
+            hitSlop={12}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: C.white,
+              alignItems: 'center',
+              justifyContent: 'center',
+              ...softShadow,
+            }}
+          >
+            <IconBack />
+          </Pressable>
+        ) : null}
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 11, letterSpacing: 3, color: C.green, fontWeight: '700' }}>COMMUNAUTÉ</Text>
           <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.dark, marginTop: 2 }}>
@@ -60,7 +62,7 @@ export default function Social() {
 
       {/* Tabs */}
       <View style={{ flexDirection: 'row', paddingHorizontal: 16, marginTop: 8, gap: 8 }}>
-        <TabPill label="Feed" active={tab === 'feed'} onPress={() => { hapticSelection(); setTab('feed'); }} />
+        <TabPill label="Fil" active={tab === 'feed'} onPress={() => { hapticSelection(); setTab('feed'); }} />
         <TabPill label="Classement" active={tab === 'classement'} onPress={() => { hapticSelection(); setTab('classement'); }} />
       </View>
 
@@ -79,7 +81,7 @@ function TabPill({ label, active, onPress }: { label: string; active: boolean; o
         borderRadius: 999,
         backgroundColor: active ? C.green : C.white,
         borderWidth: active ? 0 : 1.5,
-        borderColor: 'rgba(0,65,47,0.15)',
+        borderColor: withAlpha(C.green, 0.15),
         alignItems: 'center',
       }}
     >
@@ -128,7 +130,7 @@ function FeedView({ authorName }: { authorName: string }) {
       ListEmptyComponent={
         <View style={{ alignItems: 'center', paddingVertical: 40 }}>
           <Text style={{ fontSize: 40 }}>🌱</Text>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: C.dark, marginTop: 12 }}>Feed vide</Text>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: C.dark, marginTop: 12 }}>Fil vide</Text>
           <Text style={{ fontSize: 12, color: C.darkSoft, marginTop: 4, textAlign: 'center' }}>
             Termine une séance, un jeûne ou une commande pour alimenter le fil.
           </Text>
@@ -146,7 +148,7 @@ function PostCard({ post, kudosed, onKudos }: { post: FeedPost; kudosed: boolean
         borderRadius: 20,
         padding: 16,
         borderWidth: post.mine ? 1.5 : 1,
-        borderColor: post.mine ? 'rgba(190,211,92,0.6)' : C.beige2,
+        borderColor: post.mine ? withAlpha(C.lime, 0.6) : C.beige2,
         ...softShadow,
       }}
     >
@@ -252,11 +254,11 @@ function PostCard({ post, kudosed, onKudos }: { post: FeedPost; kudosed: boolean
 
 function KindBadge({ kind }: { kind: FeedPost['kind'] }) {
   const map: Record<FeedPost['kind'], { bg: string; color: string; label: string }> = {
-    workout: { bg: 'rgba(190,211,92,0.22)', color: C.green, label: 'SPORT' },
-    fast: { bg: 'rgba(237,126,0,0.15)', color: C.orange, label: 'JEÛNE' },
-    meal: { bg: 'rgba(0,65,47,0.08)', color: C.green, label: 'REPAS' },
-    milestone: { bg: 'rgba(237,126,0,0.15)', color: C.orange, label: 'PALIER' },
-    order: { bg: 'rgba(0,65,47,0.08)', color: C.green, label: 'COMMANDE' },
+    workout: { bg: withAlpha(C.lime, 0.22), color: C.green, label: 'SPORT' },
+    fast: { bg: withAlpha(C.orange, 0.15), color: C.orange, label: 'JEÛNE' },
+    meal: { bg: withAlpha(C.green, 0.08), color: C.green, label: 'REPAS' },
+    milestone: { bg: withAlpha(C.orange, 0.15), color: C.orange, label: 'PALIER' },
+    order: { bg: withAlpha(C.green, 0.08), color: C.green, label: 'COMMANDE' },
   };
   const m = map[kind];
   return (
@@ -292,6 +294,7 @@ function RankingView() {
   const sex = useUserStore((s) => s.sex);
   const activityLevel = useUserStore((s) => s.activityLevel);
   const hydrationMl = useUserStore((s) => s.hydrationMl);
+  const hydrationGoalMl = useUserStore((s) => s.hydrationGoalMl);
 
   const targets = useMemo(
     () => computeMacroTargets({ weightKg, heightCm, age, sex, activityLevel, goal }),
@@ -301,8 +304,8 @@ function RankingView() {
   const { steps } = useSteps();
 
   const challenges = useMemo(
-    () => generateChallenges({ goal, targets, journal, hydrationMl, stepsToday: steps }),
-    [goal, targets, journal, hydrationMl, steps]
+    () => generateChallenges({ goal, targets, journal, hydrationMl, hydrationGoalMl, stepsToday: steps }),
+    [goal, targets, journal, hydrationMl, hydrationGoalMl, steps]
   );
 
   const globalCh = challenges.filter((c) => c.scope === 'global');
@@ -340,7 +343,7 @@ function RankingView() {
     { n: 'Léa', pts: 3420, avatar: 'L', color: C.orange, delta: '+120' },
     { n: name || 'Toi', pts: points, avatar: (name || 'N')[0], color: C.green, delta: `+${pointsEarned}`, you: true },
     { n: 'Max', pts: 2610, avatar: 'M', color: C.lime, delta: '+60' },
-    { n: 'Chloé', pts: 2180, avatar: 'C', color: '#d4a574', delta: '+45' },
+    { n: 'Chloé', pts: 2180, avatar: 'C', color: C.lipid, delta: '+45' },
   ].sort((a, b) => b.pts - a.pts);
 
   return (
@@ -355,8 +358,8 @@ function RankingView() {
         end={{ x: 0.8, y: 1 }}
         style={{ marginHorizontal: 16, borderRadius: 22, padding: 20, overflow: 'hidden' }}
       >
-        <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.12)' }} />
-        <View style={{ position: 'absolute', left: -30, bottom: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(237,126,0,0.14)' }} />
+        <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.lime, 0.12) }} />
+        <View style={{ position: 'absolute', left: -30, bottom: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: withAlpha(C.orange, 0.14) }} />
 
         <View style={{ alignItems: 'center' }}>
           <Text style={{ fontSize: 11, letterSpacing: 2, color: C.lime, fontWeight: '700' }}>NIVEAU {level} · ATHLÈTE</Text>
@@ -367,7 +370,7 @@ function RankingView() {
             <Text style={{ fontSize: 18, color: C.lime, opacity: 0.8 }}>pts</Text>
           </View>
           {streakDays > 0 ? (
-            <View style={{ marginTop: 8, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: 'rgba(237,126,0,0.2)', borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={{ marginTop: 8, paddingVertical: 5, paddingHorizontal: 12, backgroundColor: withAlpha(C.orange, 0.2), borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={{ fontSize: 12 }}>🔥</Text>
               <Text style={{ fontSize: 11, fontWeight: '700', color: C.beige }}>Streak {streakDays}j</Text>
             </View>
@@ -375,7 +378,7 @@ function RankingView() {
         </View>
 
         <View style={{ paddingHorizontal: 20, marginTop: 16 }}>
-          <View style={{ height: 8, backgroundColor: 'rgba(252,233,218,0.2)', borderRadius: 999, overflow: 'hidden' }}>
+          <View style={{ height: 8, backgroundColor: withAlpha(C.beige, 0.2), borderRadius: 999, overflow: 'hidden' }}>
             <LinearGradient colors={[C.lime, C.orange]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ height: '100%', width: `${pct * 100}%`, borderRadius: 999 }} />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
@@ -426,7 +429,7 @@ function RankingView() {
               paddingVertical: 10,
               paddingHorizontal: 14,
               gap: 10,
-              backgroundColor: f.you ? 'rgba(190,211,92,0.21)' : 'transparent',
+              backgroundColor: f.you ? withAlpha(C.lime, 0.21) : 'transparent',
               marginHorizontal: f.you ? 6 : 0,
               marginVertical: f.you ? 2 : 0,
               borderRadius: f.you ? 12 : 0,
@@ -463,7 +466,7 @@ function RankingView() {
           opacity: pressed ? 0.92 : 1,
         })}
       >
-        <View style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(190,211,92,0.18)' }} />
+        <View style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: withAlpha(C.lime, 0.18) }} />
         <Text style={{ fontSize: 10, letterSpacing: 3, color: C.lime, fontWeight: '700' }}>INVITER DES AMIS</Text>
         <Text style={{ fontFamily: F.display, fontSize: 22, fontWeight: '900', color: C.beige, marginTop: 6, lineHeight: 26 }}>
           +1 produit offert{'\n'}pour chaque filleul

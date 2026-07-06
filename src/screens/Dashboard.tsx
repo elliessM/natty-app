@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, RefreshControl } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { C, F, softShadow } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import MacroRings from '../shared/MacroRings';
 import { IconBell, IconPin, IconArrow } from '../shared/Icons';
 import WaterGlass from '../shared/WaterGlass';
@@ -230,8 +230,8 @@ export default function Dashboard() {
             padding: 18,
           }}
         >
-          <View style={{ position: 'absolute', right: -60, top: -50, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(190,211,92,0.14)' }} />
-          <View style={{ position: 'absolute', left: -60, bottom: -60, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(237,126,0,0.16)' }} />
+          <View style={{ position: 'absolute', right: -60, top: -50, width: 200, height: 200, borderRadius: 100, backgroundColor: withAlpha(C.lime, 0.14) }} />
+          <View style={{ position: 'absolute', left: -60, bottom: -60, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.orange, 0.16) }} />
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
             <View style={{ width: 150, height: 150, flexShrink: 0, alignItems: 'center', justifyContent: 'center' }}>
               <MacroRings
@@ -302,7 +302,7 @@ export default function Dashboard() {
                 elevation: 6,
               })}
             >
-              <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(190,211,92,0.15)' }} />
+              <View style={{ position: 'absolute', right: -40, top: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: withAlpha(C.lime, 0.15) }} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <Text style={{ fontSize: 28 }}>🕒</Text>
                 <View style={{ flex: 1, minWidth: 0 }}>
@@ -320,7 +320,7 @@ export default function Dashboard() {
                       : 'à récupérer'}
                   </Text>
                 </View>
-                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(252,233,218,0.18)', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: withAlpha(C.beige, 0.18), alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: C.beige, fontWeight: '700', fontSize: 18 }}>→</Text>
                 </View>
               </View>
@@ -332,7 +332,7 @@ export default function Dashboard() {
         <FadeInView delay={150}>
         <View style={{ flexDirection: 'row', gap: 12, marginTop: 12, marginHorizontal: 16 }}>
           <View style={[statBox, { borderColor: stepsReached ? C.lime : C.beige2, borderWidth: stepsReached ? 1.5 : 1 }]}>
-            <View style={statIcon('rgba(237,126,0,0.18)')}>
+            <View style={statIcon(withAlpha(C.orange, 0.18))}>
               <Text style={{ fontSize: 16 }}>👟</Text>
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
@@ -381,7 +381,7 @@ export default function Dashboard() {
                   justifyContent: 'center',
                   opacity: pressed ? 0.7 : hydrationMl <= 0 ? 0.5 : 1,
                   borderWidth: 1,
-                  borderColor: 'rgba(0,65,47,0.12)',
+                  borderColor: withAlpha(C.green, 0.12),
                 })}
               >
                 <Text style={{ color: C.dark, fontWeight: '700', fontSize: 16, lineHeight: 18, includeFontPadding: false }}>−</Text>
@@ -584,7 +584,7 @@ export default function Dashboard() {
                   source={MEAL_IMAGES[e.food]}
                   fallbackEmoji={e.emoji}
                   emojiSize={20}
-                  bgColor={e.source === 'scan' ? 'rgba(237,126,0,0.15)' : 'rgba(190,211,92,0.2)'}
+                  bgColor={e.source === 'scan' ? withAlpha(C.orange, 0.15) : withAlpha(C.lime, 0.2)}
                   style={{ width: 44, height: 44, borderRadius: 12 }}
                 />
                 <View style={{ flex: 1, minWidth: 0 }}>

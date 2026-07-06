@@ -40,7 +40,6 @@ function HomeStackScreen() {
       <HomeStack.Screen name="Reservations" component={Reservations} />
       <HomeStack.Screen name="Stats" component={Stats} />
       <HomeStack.Screen name="Profile" component={ProfileStub} />
-      <HomeStack.Screen name="Social" component={Social} />
       <HomeStack.Screen name="Fasting" component={Fasting} />
       <HomeStack.Screen name="OrderTracking" component={OrderTracking} />
     </HomeStack.Navigator>
