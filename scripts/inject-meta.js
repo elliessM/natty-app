@@ -62,5 +62,44 @@ if (!html.includes('name="viewport"')) {
 }
 
 html = html.replace('</head>', `${tags}</head>`);
+
+// ─── DEBUG TEMPORAIRE : overlay de mesures viewport (PWA standalone uniquement) ───
+// À retirer une fois le bug « barre blanche en bas » diagnostiqué.
+const vpDebug = `
+<script>
+(function () {
+  if (!window.matchMedia || !matchMedia('(display-mode: standalone)').matches) return;
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);';
+  document.documentElement.appendChild(probe);
+  var box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;top:80px;left:8px;right:8px;z-index:99999;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.5 monospace;padding:10px;border-radius:8px;pointer-events:none;white-space:pre-wrap;';
+  function fmt() {
+    var cs = getComputedStyle(probe);
+    var vv = window.visualViewport;
+    var de = document.documentElement.getBoundingClientRect();
+    var bd = document.body.getBoundingClientRect();
+    return [
+      'screen: ' + screen.width + 'x' + screen.height + ' dpr:' + devicePixelRatio,
+      'innerH: ' + innerHeight + '  outerH: ' + outerHeight,
+      'visualVp: h=' + (vv ? Math.round(vv.height) : '?') + ' offTop=' + (vv ? vv.offsetTop : '?') + ' scale=' + (vv ? vv.scale : '?'),
+      'safe-area top: ' + cs.paddingTop + '  bottom: ' + cs.paddingBottom,
+      'html rect: y=' + Math.round(de.y) + ' h=' + Math.round(de.height),
+      'body rect: y=' + Math.round(bd.y) + ' h=' + Math.round(bd.height),
+      'scrollY: ' + Math.round(scrollY),
+      'ua: ' + navigator.userAgent.slice(0, 80),
+    ].join('\\n');
+  }
+  function tick() { box.textContent = fmt(); }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.body.appendChild(box);
+    tick();
+    setInterval(tick, 1000);
+  });
+})();
+</script>
+`;
+html = html.replace('</body>', `${vpDebug}</body>`);
+
 fs.writeFileSync(indexPath, html);
-console.log('[inject-meta] meta tags injectés');
+console.log('[inject-meta] meta tags injectés (+ overlay debug viewport)');
