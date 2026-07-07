@@ -124,10 +124,14 @@ function FridgeCard({ f, isSel, onPress, bg }: { f: FridgeItem; isSel: boolean; 
         paddingHorizontal: 14,
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? C.mute : C.dark }}>{f.name}</Text>
-          <Text style={{ fontSize: 11, color: disabled ? C.mute : C.darkSoft, marginTop: 2 }}>{f.addr}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? C.mute : C.dark }} numberOfLines={1}>
+            {f.name}
+          </Text>
+          <Text style={{ fontSize: 11, color: disabled ? C.mute : C.darkSoft, marginTop: 2 }} numberOfLines={1}>
+            {f.addr}
+          </Text>
         </View>
         <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: f.open ? '#d4edda' : '#fde8e8' }}>
           <Text style={{ fontSize: 10, fontWeight: '700', color: f.open ? C.green : C.danger }}>
@@ -135,7 +139,8 @@ function FridgeCard({ f, isSel, onPress, bg }: { f: FridgeItem; isSel: boolean; 
           </Text>
         </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 }}>
+      {/* flexWrap + marginLeft auto : le CTA passe à la ligne (aligné à droite) au lieu de déborder de la card */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, rowGap: 8, marginTop: 10, flexWrap: 'wrap' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <IconPin color={disabled ? C.mute : C.green} size={10} />
           <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.distLabel}</Text>
@@ -150,14 +155,13 @@ function FridgeCard({ f, isSel, onPress, bg }: { f: FridgeItem; isSel: boolean; 
             {f.stockCount > 0 ? `${f.stockCount} produits` : 'Aucun produit'}
           </Text>
         </View>
-        <View style={{ flex: 1 }} />
         {f.open ? (
           isSel ? (
-            <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
+            <View style={{ marginLeft: 'auto', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
               <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander →</Text>
             </View>
           ) : (
-            <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>
+            <View style={{ marginLeft: 'auto', paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>
               <Text style={{ fontSize: 10, fontWeight: '700', color: C.green }}>Voir stock</Text>
             </View>
           )
