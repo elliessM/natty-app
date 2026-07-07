@@ -4,10 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Path } from 'react-native-svg';
-import { C, F, withAlpha } from '../tokens';
+import { C, F, softShadow, withAlpha } from '../tokens';
 import { IconSearch, IconFilter, IconPin, IconClock, IconBox, IconRecenter } from '../shared/Icons';
 import { FRIDGES, distanceMeters, formatDistance, walkingTime } from '../data/fridges';
 import { useLocation } from '../hooks/useLocation';
+import { hapticSelection } from '../shared/haptics';
 import type { MapStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<MapStackParamList, 'SmartMap'>;
@@ -19,12 +20,48 @@ const PIN_POS = [
   { x: 332, y: 114, size: 36 },
 ];
 
-const FILTERS = [
-  { t: 'Ouvert', on: true },
-  { t: '< 5 min' },
-  { t: 'Protéines' },
-  { t: 'Repas' },
-];
+// Seule « Ouvert » est fonctionnelle — les autres sont décoratives (pas encore de données produit par frigo).
+const DECORATIVE_FILTERS = ['< 5 min', 'Protéines', 'Repas'];
+
+const chipStyle = (on: boolean) =>
+  ({
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: on ? C.green : C.white,
+    borderWidth: on ? 0 : 1,
+    borderColor: withAlpha(C.green, 0.2),
+  }) as const;
+
+const chipTextStyle = (on: boolean) =>
+  ({
+    color: on ? C.beige : C.dark,
+    fontSize: 10,
+    fontWeight: on ? ('700' as const) : ('500' as const),
+  }) as const;
+
+function FilterChips({ openOnly, onToggleOpen }: { openOnly: boolean; onToggleOpen: () => void }) {
+  return (
+    <View style={{ flexDirection: 'row', gap: 8 }}>
+      <Pressable
+        onPress={() => {
+          hapticSelection();
+          onToggleOpen();
+        }}
+        accessibilityRole="button"
+        accessibilityState={{ selected: openOnly }}
+        style={chipStyle(openOnly)}
+      >
+        <Text style={chipTextStyle(openOnly)}>Ouvert</Text>
+      </Pressable>
+      {DECORATIVE_FILTERS.map((t) => (
+        <View key={t} style={chipStyle(false)}>
+          <Text style={chipTextStyle(false)}>{t}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 const SEED: [number, number, number, number][] = [
   [0, 60, 240, 10],
@@ -70,12 +107,113 @@ function MapTiles() {
   );
 }
 
+type FridgeItem = (typeof FRIDGES)[number] & { dist: number; distLabel: string; timeLabel: string };
+
+function FridgeCard({ f, isSel, onPress, bg }: { f: FridgeItem; isSel: boolean; onPress: () => void; bg: string }) {
+  const disabled = !f.open;
+  return (
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      style={{
+        borderRadius: 16,
+        backgroundColor: isSel ? '#e8f2ec' : bg,
+        borderWidth: isSel ? 1.5 : 0,
+        borderColor: C.green,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+      }}
+    >
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <View>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? C.mute : C.dark }}>{f.name}</Text>
+          <Text style={{ fontSize: 11, color: disabled ? C.mute : C.darkSoft, marginTop: 2 }}>{f.addr}</Text>
+        </View>
+        <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: f.open ? '#d4edda' : '#fde8e8' }}>
+          <Text style={{ fontSize: 10, fontWeight: '700', color: f.open ? C.green : C.danger }}>
+            {f.open ? '● Ouvert' : '● Fermé'}
+          </Text>
+        </View>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <IconPin color={disabled ? C.mute : C.green} size={10} />
+          <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.distLabel}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <IconClock color={disabled ? C.mute : C.green} />
+          <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.timeLabel}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <IconBox color={disabled ? C.mute : C.orange} />
+          <Text style={{ fontSize: 11, fontWeight: '700', color: disabled ? C.mute : C.orange }}>
+            {f.stockCount > 0 ? `${f.stockCount} produits` : 'Aucun produit'}
+          </Text>
+        </View>
+        <View style={{ flex: 1 }} />
+        {f.open ? (
+          isSel ? (
+            <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander →</Text>
+            </View>
+          ) : (
+            <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: C.green }}>Voir stock</Text>
+            </View>
+          )
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+function ViewToggle({ view, onChange }: { view: 'list' | 'map'; onChange: (v: 'list' | 'map') => void }) {
+  return (
+    <View style={{ flexDirection: 'row', backgroundColor: C.white, borderRadius: 999, padding: 3, ...softShadow }}>
+      {(
+        [
+          { v: 'list', label: 'Liste' },
+          { v: 'map', label: 'Carte' },
+        ] as const
+      ).map(({ v, label }) => {
+        const active = view === v;
+        return (
+          <Pressable
+            key={v}
+            onPress={() => {
+              if (!active) {
+                hapticSelection();
+                onChange(v);
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            style={{
+              flex: 1,
+              paddingVertical: 8,
+              borderRadius: 999,
+              backgroundColor: active ? C.green : 'transparent',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 12, fontWeight: '700', color: active ? C.beige : C.darkSoft }}>{label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function SmartMap() {
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
   const searchTop = insets.top + 8;
-  const filtersTop = searchTop + 62;
+  const toggleTop = searchTop + 62;
+  const filtersTop = toggleTop + 52;
   const { coords, granted } = useLocation();
+
+  const [view, setView] = useState<'list' | 'map'>('list');
+  const [openOnly, setOpenOnly] = useState(false);
 
   // Bottom sheet draggable : 2 snap points (replié / déployé) + drag fluide.
   const COLLAPSED_TOP = 506;
@@ -149,7 +287,82 @@ export default function SmartMap() {
   }, [coords]);
 
   const closestOpen = sortedFridges.find((f) => f.open);
+  const listFridges = openOnly ? sortedFridges.filter((f) => f.open) : sortedFridges;
+  const openCount = sortedFridges.filter((f) => f.open).length;
 
+  // ─── Vue Liste (par défaut) ───────────────────────────────────────
+  if (view === 'list') {
+    return (
+      <View style={{ flex: 1, backgroundColor: C.beige }}>
+        <View style={{ paddingTop: searchTop, paddingHorizontal: 16, gap: 12 }}>
+          <View
+            style={{
+              height: 48,
+              borderRadius: 24,
+              backgroundColor: C.white,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 14,
+              gap: 10,
+              ...softShadow,
+            }}
+          >
+            <IconSearch />
+            <Text style={{ flex: 1, fontSize: 13, color: C.mute }}>Trouver un Natty Fridge...</Text>
+            <IconFilter />
+          </View>
+          <ViewToggle view={view} onChange={setView} />
+          <FilterChips openOnly={openOnly} onToggleOpen={() => setOpenOnly((v) => !v)} />
+          <View
+            style={{
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 999,
+              backgroundColor: withAlpha(C.green, 0.85),
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              alignSelf: 'flex-start',
+            }}
+          >
+            <Text style={{ fontSize: 10 }}>🚧</Text>
+            <Text style={{ fontSize: 10, fontWeight: '700', color: C.lime, letterSpacing: 1 }}>PREVIEW · 1ER FRIGO FIN 2026</Text>
+          </View>
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 20, marginTop: 18 }}>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: C.dark }}>Frigos Natty proches</Text>
+          <Text style={{ fontSize: 10, color: C.green, fontWeight: '500' }}>{openCount} disponibles</Text>
+        </View>
+        <Text style={{ paddingHorizontal: 20, marginTop: 2, fontSize: 11, color: C.mute }}>
+          {granted ? 'Trié par distance' : 'Position indisponible · distances relatives'}
+        </Text>
+
+        <ScrollView
+          style={{ marginTop: 10 }}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: insets.bottom + 24 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {listFridges.map((f) => (
+            <FridgeCard
+              key={f.id}
+              f={f}
+              isSel={f.id === closestOpen?.id}
+              onPress={() => navigation.navigate('AchatS1')}
+              bg={C.white}
+            />
+          ))}
+          {listFridges.length === 0 ? (
+            <Text style={{ textAlign: 'center', fontSize: 12, color: C.mute, marginTop: 30 }}>
+              Aucun frigo ouvert pour le moment.
+            </Text>
+          ) : null}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // ─── Vue Carte ────────────────────────────────────────────────────
   return (
     <View style={{ flex: 1, backgroundColor: '#edf0ea', overflow: 'hidden' }}>
       <MapTiles />
@@ -204,22 +417,12 @@ export default function SmartMap() {
         <Text style={{ fontSize: 10, fontWeight: '700', color: C.lime, letterSpacing: 1 }}>PREVIEW · 1ER FRIGO FIN 2026</Text>
       </View>
 
-      <View style={{ position: 'absolute', left: 16, top: filtersTop, flexDirection: 'row', gap: 8 }}>
-        {FILTERS.map((c, i) => (
-          <View
-            key={i}
-            style={{
-              paddingVertical: 7,
-              paddingHorizontal: 14,
-              borderRadius: 999,
-              backgroundColor: c.on ? C.green : C.white,
-              borderWidth: c.on ? 0 : 1,
-              borderColor: withAlpha(C.green, 0.2),
-            }}
-          >
-            <Text style={{ color: c.on ? C.beige : C.dark, fontSize: 10, fontWeight: c.on ? '700' : '500' }}>{c.t}</Text>
-          </View>
-        ))}
+      <View style={{ position: 'absolute', left: 16, right: 16, top: toggleTop }}>
+        <ViewToggle view={view} onChange={setView} />
+      </View>
+
+      <View style={{ position: 'absolute', left: 16, top: filtersTop }}>
+        <FilterChips openOnly={openOnly} onToggleOpen={() => setOpenOnly((v) => !v)} />
       </View>
 
       {PIN_POS.map((p, i) => {
@@ -338,65 +541,15 @@ export default function SmartMap() {
           {granted ? 'Trié par distance' : 'Position indisponible · distances relatives'}
         </Text>
         <ScrollView style={{ paddingHorizontal: 14 }} contentContainerStyle={{ gap: 10, paddingBottom: 120 }}>
-          {sortedFridges.map((f) => {
-            const isSel = f.id === closestOpen?.id;
-            const disabled = !f.open;
-            return (
-              <Pressable
-                key={f.id}
-                disabled={disabled}
-                onPress={() => navigation.navigate('AchatS1')}
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: isSel ? '#e8f2ec' : '#f4f4f4',
-                  borderWidth: isSel ? 1.5 : 0,
-                  borderColor: C.green,
-                  paddingVertical: 12,
-                  paddingHorizontal: 14,
-                }}
-              >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <View>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: disabled ? C.mute : C.dark }}>{f.name}</Text>
-                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.darkSoft, marginTop: 2 }}>{f.addr}</Text>
-                  </View>
-                  <View style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: f.open ? '#d4edda' : '#fde8e8' }}>
-                    <Text style={{ fontSize: 10, fontWeight: '700', color: f.open ? C.green : C.danger }}>
-                      {f.open ? '● Ouvert' : '● Fermé'}
-                    </Text>
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconPin color={disabled ? C.mute : C.green} size={10} />
-                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.distLabel}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconClock color={disabled ? C.mute : C.green} />
-                    <Text style={{ fontSize: 11, color: disabled ? C.mute : C.green }}>{f.timeLabel}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <IconBox color={disabled ? C.mute : C.orange} />
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: disabled ? C.mute : C.orange }}>
-                      {f.stockCount > 0 ? `${f.stockCount} produits` : 'Aucun produit'}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }} />
-                  {f.open ? (
-                    isSel ? (
-                      <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander →</Text>
-                      </View>
-                    ) : (
-                      <View style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: C.green }}>Voir stock</Text>
-                      </View>
-                    )
-                  ) : null}
-                </View>
-              </Pressable>
-            );
-          })}
+          {listFridges.map((f) => (
+            <FridgeCard
+              key={f.id}
+              f={f}
+              isSel={f.id === closestOpen?.id}
+              onPress={() => navigation.navigate('AchatS1')}
+              bg="#f4f4f4"
+            />
+          ))}
         </ScrollView>
       </Animated.View>
     </View>
