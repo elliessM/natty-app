@@ -123,7 +123,7 @@ export default function OnbReady() {
         <View style={{ flex: 1, minHeight: 20 }} />
 
         <View style={{ marginTop: 24, marginBottom: 14 }}>
-          <OnboardingProgress step={7} total={7} tone="dark" />
+          <OnboardingProgress step={8} total={8} tone="dark" />
         </View>
         <Pressable onPress={() => setHasOnboarded(true)} style={btnPrimary()}>
           <Text style={btnPrimaryLabel}>Ouvrir mon tableau de bord →</Text>

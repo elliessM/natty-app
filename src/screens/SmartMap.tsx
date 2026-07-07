@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Pressable, ScrollView, Animated, Easing, PanResponder } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, Animated, Easing, PanResponder } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Path } from 'react-native-svg';
 import { C, F, softShadow, withAlpha } from '../tokens';
-import { IconSearch, IconFilter, IconPin, IconClock, IconBox, IconRecenter } from '../shared/Icons';
+import { IconSearch, IconFilter, IconPin, IconClock, IconBox } from '../shared/Icons';
 import { FRIDGES, distanceMeters, formatDistance, walkingTime } from '../data/fridges';
 import { useLocation } from '../hooks/useLocation';
 import { hapticSelection } from '../shared/haptics';
@@ -20,8 +20,8 @@ const PIN_POS = [
   { x: 332, y: 114, size: 36 },
 ];
 
-// Seule « Ouvert » est fonctionnelle — les autres sont décoratives (pas encore de données produit par frigo).
-const DECORATIVE_FILTERS = ['< 5 min', 'Protéines', 'Repas'];
+// Seuil du filtre « < 5 min » : 5 min de marche à ~80 m/min.
+const NEAR_METERS = 5 * 80;
 
 const chipStyle = (on: boolean) =>
   ({
@@ -40,27 +40,44 @@ const chipTextStyle = (on: boolean) =>
     fontWeight: on ? ('700' as const) : ('500' as const),
   }) as const;
 
-function FilterChips({ openOnly, onToggleOpen }: { openOnly: boolean; onToggleOpen: () => void }) {
+function FilterChip({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
+  return (
+    <Pressable
+      onPress={() => {
+        hapticSelection();
+        onToggle();
+      }}
+      accessibilityRole="button"
+      accessibilityState={{ selected: on }}
+      style={chipStyle(on)}
+    >
+      <Text style={chipTextStyle(on)}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function FilterChips({
+  openOnly,
+  nearOnly,
+  onToggleOpen,
+  onToggleNear,
+}: {
+  openOnly: boolean;
+  nearOnly: boolean;
+  onToggleOpen: () => void;
+  onToggleNear: () => void;
+}) {
   return (
     <View style={{ flexDirection: 'row', gap: 8 }}>
-      <Pressable
-        onPress={() => {
-          hapticSelection();
-          onToggleOpen();
-        }}
-        accessibilityRole="button"
-        accessibilityState={{ selected: openOnly }}
-        style={chipStyle(openOnly)}
-      >
-        <Text style={chipTextStyle(openOnly)}>Ouvert</Text>
-      </Pressable>
-      {DECORATIVE_FILTERS.map((t) => (
-        <View key={t} style={chipStyle(false)}>
-          <Text style={chipTextStyle(false)}>{t}</Text>
-        </View>
-      ))}
+      <FilterChip label="Ouvert" on={openOnly} onToggle={onToggleOpen} />
+      <FilterChip label="< 5 min" on={nearOnly} onToggle={onToggleNear} />
     </View>
   );
+}
+
+/** Comparaison sans accents ni casse pour la recherche. */
+function norm(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
 const SEED: [number, number, number, number][] = [
@@ -218,6 +235,8 @@ export default function SmartMap() {
 
   const [view, setView] = useState<'list' | 'map'>('list');
   const [openOnly, setOpenOnly] = useState(false);
+  const [nearOnly, setNearOnly] = useState(false);
+  const [query, setQuery] = useState('');
 
   // Bottom sheet draggable : 2 snap points (replié / déployé) + drag fluide.
   const COLLAPSED_TOP = 506;
@@ -291,7 +310,13 @@ export default function SmartMap() {
   }, [coords]);
 
   const closestOpen = sortedFridges.find((f) => f.open);
-  const listFridges = openOnly ? sortedFridges.filter((f) => f.open) : sortedFridges;
+  const q = norm(query.trim());
+  const listFridges = sortedFridges.filter(
+    (f) =>
+      (!openOnly || f.open) &&
+      (!nearOnly || f.dist <= NEAR_METERS) &&
+      (!q || norm(f.name).includes(q) || norm(f.addr).includes(q))
+  );
   const openCount = sortedFridges.filter((f) => f.open).length;
 
   // ─── Vue Liste (par défaut) ───────────────────────────────────────
@@ -312,11 +337,30 @@ export default function SmartMap() {
             }}
           >
             <IconSearch />
-            <Text style={{ flex: 1, fontSize: 13, color: C.mute }}>Trouver un Natty Fridge...</Text>
-            <IconFilter />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Trouver un Natty Fridge..."
+              placeholderTextColor={C.mute}
+              accessibilityLabel="Rechercher un frigo"
+              returnKeyType="search"
+              style={{ flex: 1, fontSize: 13, color: C.dark, paddingVertical: 0 }}
+            />
+            {query.length > 0 ? (
+              <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityLabel="Effacer la recherche">
+                <Text style={{ fontSize: 14, color: C.mute }}>✕</Text>
+              </Pressable>
+            ) : (
+              <IconFilter />
+            )}
           </View>
           <ViewToggle view={view} onChange={setView} />
-          <FilterChips openOnly={openOnly} onToggleOpen={() => setOpenOnly((v) => !v)} />
+          <FilterChips
+            openOnly={openOnly}
+            nearOnly={nearOnly}
+            onToggleOpen={() => setOpenOnly((v) => !v)}
+            onToggleNear={() => setNearOnly((v) => !v)}
+          />
           <View
             style={{
               paddingVertical: 6,
@@ -358,7 +402,7 @@ export default function SmartMap() {
           ))}
           {listFridges.length === 0 ? (
             <Text style={{ textAlign: 'center', fontSize: 12, color: C.mute, marginTop: 30 }}>
-              Aucun frigo ouvert pour le moment.
+              {q ? 'Aucun frigo ne correspond à ta recherche.' : 'Aucun frigo ne correspond aux filtres.'}
             </Text>
           ) : null}
         </ScrollView>
@@ -375,7 +419,14 @@ export default function SmartMap() {
         <Path d="M 146 270 Q 200 260 242 298" stroke={C.orange} strokeWidth={3} strokeDasharray="6 6" fill="none" opacity={0.6} />
       </Svg>
 
-      <View
+      {/* La recherche vit dans la vue Liste : taper ici bascule dessus */}
+      <Pressable
+        onPress={() => {
+          hapticSelection();
+          setView('list');
+        }}
+        accessibilityRole="button"
+        accessibilityLabel="Rechercher un frigo (ouvre la liste)"
         style={{
           position: 'absolute',
           left: 16,
@@ -398,7 +449,7 @@ export default function SmartMap() {
         <IconSearch />
         <Text style={{ flex: 1, fontSize: 13, color: C.mute }}>Trouver un Natty Fridge...</Text>
         <IconFilter />
-      </View>
+      </Pressable>
       {/* Preview banner — mention claire pour la démo, sans casser le parcours */}
       <View
         style={{
@@ -426,7 +477,12 @@ export default function SmartMap() {
       </View>
 
       <View style={{ position: 'absolute', left: 16, top: filtersTop }}>
-        <FilterChips openOnly={openOnly} onToggleOpen={() => setOpenOnly((v) => !v)} />
+        <FilterChips
+          openOnly={openOnly}
+          nearOnly={nearOnly}
+          onToggleOpen={() => setOpenOnly((v) => !v)}
+          onToggleNear={() => setNearOnly((v) => !v)}
+        />
       </View>
 
       {PIN_POS.map((p, i) => {
@@ -463,7 +519,15 @@ export default function SmartMap() {
                 </Text>
               </View>
             ) : null}
-            <View
+            <Pressable
+              disabled={!fridge.open}
+              onPress={() => {
+                hapticSelection();
+                navigation.navigate('AchatS1');
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={`${fridge.name}, ${fridge.distLabel}`}
+              hitSlop={8}
               style={{
                 width: p.size,
                 height: p.size,
@@ -479,31 +543,10 @@ export default function SmartMap() {
               }}
             >
               <Text style={{ fontFamily: F.display, fontWeight: '900', fontSize: p.size > 40 ? 20 : 16, color: C.beige }}>N</Text>
-            </View>
+            </Pressable>
           </View>
         );
       })}
-
-      <View
-        style={{
-          position: 'absolute',
-          right: 20,
-          top: 460,
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          backgroundColor: C.white,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          elevation: 3,
-        }}
-      >
-        <IconRecenter />
-      </View>
 
       <Animated.View
         style={{

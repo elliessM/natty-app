@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -27,26 +27,33 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        await Font.loadAsync({
-          // Display heavy (anciennement Obviously qui n'avait pas les accents)
-          Archivo_900Black,
-          Obviously: Archivo_900Black,
-          // Body sans-serif moderne, charge en 4 poids pour Text + TextInput
-          Manrope_400Regular,
-          Manrope_500Medium,
-          Manrope_600SemiBold,
-          Manrope_700Bold,
-          // Alias 'Manrope' pour éviter de toucher tous les fontFamily du code
-          Manrope: Manrope_400Regular,
-        });
-      } catch {
-        /* fonts optional — system fallback */
-      }
+    const fonts = Font.loadAsync({
+      // Display heavy (anciennement Obviously qui n'avait pas les accents)
+      Archivo_900Black,
+      Obviously: Archivo_900Black,
+      // Body sans-serif moderne, charge en 4 poids pour Text + TextInput
+      Manrope_400Regular,
+      Manrope_500Medium,
+      Manrope_600SemiBold,
+      Manrope_700Bold,
+      // Alias 'Manrope' pour éviter de toucher tous les fontFamily du code
+      Manrope: Manrope_400Regular,
+    }).catch(() => {
+      /* fonts optional — system fallback */
+    });
+
+    if (Platform.OS === 'web') {
+      // Web/PWA : ne pas bloquer le premier rendu sur ~600 KB de polices —
+      // l'UI s'affiche en police système puis bascule quand les fonts arrivent.
       setReady(true);
       SplashScreen.hideAsync().catch(() => {});
-    })();
+      return;
+    }
+
+    fonts.then(() => {
+      setReady(true);
+      SplashScreen.hideAsync().catch(() => {});
+    });
   }, []);
 
   if (!ready) return null;

@@ -10,6 +10,7 @@ export type RootStackParamList = {
 
 export type OnboardingStackParamList = {
   Welcome: undefined;
+  HowItWorks: undefined;
   Objectifs: undefined;
   Identity: undefined;
   Measurements: undefined;
@@ -33,6 +34,7 @@ export type HomeStackParamList = {
   Stats: undefined;
   Profile: undefined;
   Fasting: undefined;
+  Notifications: undefined;
   OrderTracking: { id: string };
 };
 

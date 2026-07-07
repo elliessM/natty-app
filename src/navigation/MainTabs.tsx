@@ -21,6 +21,7 @@ import Social from '../screens/Social';
 import ProfileStub from '../screens/ProfileStub';
 import Sport from '../screens/Sport';
 import Fasting from '../screens/Fasting';
+import Notifications from '../screens/Notifications';
 import OrderTracking from '../screens/OrderTracking';
 import MapStack from './MapStack';
 import { IconHome, IconMap, IconDumbbell, IconTrophy, IconCamera } from '../shared/Icons';
@@ -41,6 +42,7 @@ function HomeStackScreen() {
       <HomeStack.Screen name="Stats" component={Stats} />
       <HomeStack.Screen name="Profile" component={ProfileStub} />
       <HomeStack.Screen name="Fasting" component={Fasting} />
+      <HomeStack.Screen name="Notifications" component={Notifications} />
       <HomeStack.Screen name="OrderTracking" component={OrderTracking} />
     </HomeStack.Navigator>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { OnboardingStackParamList } from './types';
 import OnbWelcome from '../screens/OnbWelcome';
+import OnbHowItWorks from '../screens/OnbHowItWorks';
 import OnbObjectifs from '../screens/OnbObjectifs';
 import OnbIdentity from '../screens/OnbIdentity';
 import OnbMeasurements from '../screens/OnbMeasurements';
@@ -17,6 +18,7 @@ export default function OnboardingStack() {
       screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: '#00412f' } }}
     >
       <Stack.Screen name="Welcome" component={OnbWelcome} />
+      <Stack.Screen name="HowItWorks" component={OnbHowItWorks} />
       <Stack.Screen name="Objectifs" component={OnbObjectifs} />
       <Stack.Screen name="Identity" component={OnbIdentity} />
       <Stack.Screen name="Measurements" component={OnbMeasurements} />

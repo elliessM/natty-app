@@ -15,8 +15,13 @@ type LocationState = {
  * Returns a best-effort location:
  *  - Real coords if permission granted
  *  - Compans-Caffarelli (Toulouse) as fallback (so UI can still render distances)
+ *
+ * `request: false` → n'affiche JAMAIS le prompt de permission : on utilise la
+ * position uniquement si elle est déjà autorisée. Permet au Dashboard de ne pas
+ * déclencher la demande OS à froid dès l'ouverture de l'app — le prompt n'apparaît
+ * que sur l'onglet Frigos (contexte clair pour l'utilisateur).
  */
-export function useLocation(): LocationState {
+export function useLocation({ request = true }: { request?: boolean } = {}): LocationState {
   const [state, setState] = useState<LocationState>({
     coords: COMPANS_CENTER,
     loading: true,
@@ -28,7 +33,9 @@ export function useLocation(): LocationState {
     let cancelled = false;
     (async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        const { status } = request
+          ? await Location.requestForegroundPermissionsAsync()
+          : await Location.getForegroundPermissionsAsync();
         if (cancelled) return;
         if (status !== 'granted') {
           setState({ coords: COMPANS_CENTER, loading: false, granted: false, error: null });
@@ -50,7 +57,7 @@ export function useLocation(): LocationState {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [request]);
 
   return state;
 }

@@ -28,12 +28,12 @@ export default function OnbObjectifs() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.beige }}>
-      <TopNav onBack={() => navigation.goBack()} stepText="2 / 7" />
+      <TopNav onBack={() => navigation.goBack()} stepText="3 / 8" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 40, paddingTop: insets.top + 80, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 02</Text>
+        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 03</Text>
         <Text
           style={{
             fontFamily: F.display,
@@ -95,9 +95,9 @@ export default function OnbObjectifs() {
 
         <View style={{ marginTop: 32, alignItems: 'center' }}>
           <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: withAlpha(C.lime, 0.25), overflow: 'hidden' }}>
-            <View style={{ width: `${(2 / 7) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
+            <View style={{ width: `${(3 / 8) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
           </View>
-          <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>2 / 7</Text>
+          <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>3 / 8</Text>
         </View>
 
         <Pressable onPress={() => navigation.navigate('Identity')} style={[btnDark(), { marginTop: 20 }]}>

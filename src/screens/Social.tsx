@@ -245,8 +245,6 @@ function PostCard({ post, kudosed, onKudos }: { post: FeedPost; kudosed: boolean
           <Text style={{ fontSize: 16 }}>💬</Text>
           <Text style={{ fontSize: 12, fontWeight: '700', color: C.darkSoft }}>{post.comments}</Text>
         </View>
-        <View style={{ flex: 1 }} />
-        <Text style={{ fontSize: 18, color: C.darkSoft }}>⋯</Text>
       </View>
     </View>
   );

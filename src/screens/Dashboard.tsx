@@ -23,8 +23,9 @@ import {
 } from '../store/useReservationsStore';
 import { FRIDGES, distanceMeters, formatDistance, walkingTime } from '../data/fridges';
 import { useLocation } from '../hooks/useLocation';
+import { useAppNotifications } from '../hooks/useAppNotifications';
 import { hapticLight, hapticSuccess } from '../shared/haptics';
-import { MEAL_IMAGES } from '../data/images';
+import { mealImageFor } from '../data/images';
 import SmartImage from '../shared/SmartImage';
 
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
@@ -50,6 +51,7 @@ function entryRelativeLabel(ts: number): string {
 export default function Dashboard() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+  const notifCount = useAppNotifications().length;
   const name = useUserStore((s) => s.name);
   const hydrationMl = useUserStore((s) => s.hydrationMl);
   const hydrationGoalMl = useUserStore((s) => s.hydrationGoalMl);
@@ -125,7 +127,8 @@ export default function Dashboard() {
   const hydrationPct = Math.min(hydrationMl / hydrationGoalMl, 1);
   const hydrationReached = hydrationMl >= hydrationGoalMl;
 
-  const { coords } = useLocation();
+  // Pas de prompt géoloc à froid sur l'écran d'accueil — position utilisée seulement si déjà autorisée.
+  const { coords } = useLocation({ request: false });
   const closestFridge = React.useMemo(() => {
     const openFridges = FRIDGES.filter((f) => f.open);
     if (openFridges.length === 0) return null;
@@ -191,6 +194,11 @@ export default function Dashboard() {
           </View>
           <Pressable
             accessibilityLabel="Notifications"
+            accessibilityRole="button"
+            onPress={() => {
+              hapticLight();
+              navigation.navigate('Notifications');
+            }}
             style={{
               width: 44,
               height: 44,
@@ -202,19 +210,21 @@ export default function Dashboard() {
             }}
           >
             <IconBell color={C.dark} />
-            <View
-              style={{
-                position: 'absolute',
-                right: 10,
-                top: 10,
-                width: 9,
-                height: 9,
-                borderRadius: 4.5,
-                backgroundColor: C.orange,
-                borderWidth: 2,
-                borderColor: '#fff',
-              }}
-            />
+            {notifCount > 0 ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 10,
+                  width: 9,
+                  height: 9,
+                  borderRadius: 4.5,
+                  backgroundColor: C.orange,
+                  borderWidth: 2,
+                  borderColor: '#fff',
+                }}
+              />
+            ) : null}
           </Pressable>
         </View>
 
@@ -581,7 +591,7 @@ export default function Dashboard() {
                 })}
               >
                 <SmartImage
-                  source={MEAL_IMAGES[e.food]}
+                  source={mealImageFor(e.food)}
                   fallbackEmoji={e.emoji}
                   emojiSize={20}
                   bgColor={e.source === 'scan' ? withAlpha(C.orange, 0.15) : withAlpha(C.lime, 0.2)}

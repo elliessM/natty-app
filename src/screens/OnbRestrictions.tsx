@@ -28,12 +28,12 @@ export default function OnbRestrictions() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.beige }}>
-      <TopNav onBack={() => navigation.goBack()} stepText="6 / 7" />
+      <TopNav onBack={() => navigation.goBack()} stepText="7 / 8" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 40, paddingTop: insets.top + 80, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 06</Text>
+        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 07</Text>
         <Text
           style={{
             fontFamily: F.display,
@@ -99,9 +99,9 @@ export default function OnbRestrictions() {
 
         <View style={{ marginTop: 32, alignItems: 'center' }}>
           <View style={{ width: 200, height: 4, borderRadius: 999, backgroundColor: withAlpha(C.lime, 0.25), overflow: 'hidden' }}>
-            <View style={{ width: `${(6 / 7) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
+            <View style={{ width: `${(7 / 8) * 100}%`, height: '100%', backgroundColor: C.orange, borderRadius: 999 }} />
           </View>
-          <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>6 / 7</Text>
+          <Text style={{ fontSize: 11, color: C.green, letterSpacing: 2, fontWeight: '700', marginTop: 10 }}>7 / 8</Text>
         </View>
 
         <View style={{ marginTop: 20, gap: 8 }}>

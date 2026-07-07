@@ -57,13 +57,13 @@ export default function OnbMeasurements() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.beige }}>
-      <TopNav onBack={() => navigation.goBack()} stepText="4 / 7" />
+      <TopNav onBack={() => navigation.goBack()} stepText="5 / 8" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 32, paddingTop: insets.top + 80, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 04</Text>
+        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 05</Text>
         <Text style={{ fontFamily: F.display, fontWeight: '900', fontSize: 32, color: C.green, marginTop: 8, marginBottom: 6, lineHeight: 34 }}>
           Tes mesures
         </Text>
@@ -137,7 +137,7 @@ export default function OnbMeasurements() {
         <View style={{ flex: 1, minHeight: 40 }} />
 
         <View style={{ marginTop: 32, marginBottom: 16 }}>
-          <OnboardingProgress step={4} total={7} />
+          <OnboardingProgress step={5} total={8} />
         </View>
         <Pressable onPress={continueNext} disabled={!canContinue} style={[btnDark(), { opacity: canContinue ? 1 : 0.4 }]}>
           <Text style={btnDarkLabel}>Continuer</Text>

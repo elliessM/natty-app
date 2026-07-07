@@ -101,11 +101,11 @@ export default function OnbWelcome() {
         <View style={{ flex: 1, minHeight: 24 }} />
 
         <View style={{ marginTop: 28, gap: 10 }}>
-          <Pressable onPress={() => navigation.navigate('Objectifs')} style={btnPrimary()}>
+          <Pressable onPress={() => navigation.navigate('HowItWorks')} style={btnPrimary()}>
             <Text style={btnPrimaryLabel}>Configurer mon profil →</Text>
           </Pressable>
           <Text style={{ fontSize: 11, color: C.lime, opacity: 0.7, textAlign: 'center', marginTop: 4 }}>
-            Étape 1 sur 7 · 2 minutes
+            Étape 1 sur 8 · 2 minutes
           </Text>
         </View>
       </ScrollView>

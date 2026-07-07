@@ -1,34 +1,32 @@
-// LoremFlickr returns CC-licensed Flickr photos matched by tags.
-// `lock=N` makes each URL return the same image every time (enables caching).
-// Phase 6 : remplacer les URL par des require('../../assets/images/xxx.jpg') quand Elliess aura ses propres visuels.
+// Visuels bundlés en local (photos Unsplash, licence libre, pas d'attribution requise).
+// Plus aucune dépendance réseau : chargement instantané, fiable hors ligne et en démo.
+import type { ImageSourcePropType } from 'react-native';
 
-const flickr = (keywords: string, lock: number, w = 600, h = 400) =>
-  `https://loremflickr.com/${w}/${h}/${encodeURIComponent(keywords)}?lock=${lock}`;
-
-/** Product id → URL. Fallback to emoji handled by SmartImage. */
-export const PRODUCT_IMAGES: Record<string, string> = {
-  bowl: flickr('chicken,bowl,rice,healthy,food', 101),
-  bar: flickr('energy,bar,protein,chocolate,snack', 102),
-  wrap: flickr('wrap,vegetable,fresh,salad,healthy', 103),
-  shake: flickr('smoothie,protein,shake,green,drink', 104),
+/** Product id → asset local. Fallback emoji géré par SmartImage. */
+export const PRODUCT_IMAGES: Record<string, ImageSourcePropType> = {
+  bowl: require('../../assets/images/product-bowl.jpg'),
+  bar: require('../../assets/images/product-bar.jpg'),
+  wrap: require('../../assets/images/product-wrap.jpg'),
+  shake: require('../../assets/images/product-shake.jpg'),
 };
 
-/** Dashboard "Cette semaine" meals — keyed by label. */
-export const MEAL_IMAGES: Record<string, string> = {
-  'Chicken Bowl': flickr('chicken,bowl,rice,healthy,food', 101),
-  'Protein Shake': flickr('smoothie,protein,shake,green,drink', 104),
-  'Energy Bar': flickr('energy,bar,protein,chocolate,snack', 102),
+/** Repas du Dashboard — indexés par libellé. */
+export const MEAL_IMAGES: Record<string, ImageSourcePropType> = {
+  'Chicken Bowl': PRODUCT_IMAGES.bowl,
+  'Protein Shake': PRODUCT_IMAGES.shake,
+  'Energy Bar': PRODUCT_IMAGES.bar,
+  'Veggie Wrap': PRODUCT_IMAGES.wrap,
 };
 
-/** Scanner result food photo (matches the identified dish name). */
-export const SCANNER_DEFAULT_IMAGE = flickr('chicken,rice,plate,grilled,healthy', 201);
+/**
+ * Correspondance tolérante : « Chicken Bowl · 1 unité » matche la clé « Chicken Bowl ».
+ * Retourne undefined si aucun visuel ne correspond (SmartImage affiche l'emoji).
+ */
+export function mealImageFor(food: string): ImageSourcePropType | undefined {
+  if (MEAL_IMAGES[food]) return MEAL_IMAGES[food];
+  const key = Object.keys(MEAL_IMAGES).find((k) => food.startsWith(k));
+  return key ? MEAL_IMAGES[key] : undefined;
+}
 
-/** Fridge / location hero photos (keyed by fridge id). */
-export const FRIDGE_IMAGES: Record<string, string> = {
-  fpcompans: flickr('gym,fitness,club,interior', 301),
-  szjeannedarc: flickr('sport,gym,modern,fitness,studio', 302),
-  urbcapitole: flickr('workout,gym,urban,fitness,club', 303),
-};
-
-/** Closest fridge hero on Dashboard. */
-export const CLOSEST_FRIDGE_BG = flickr('gym,fitness,interior,modern,warm', 304);
+/** Photo du plat identifié par le scanner. */
+export const SCANNER_DEFAULT_IMAGE: ImageSourcePropType = require('../../assets/images/scanner-meal.jpg');

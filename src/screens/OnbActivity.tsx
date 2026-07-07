@@ -36,12 +36,12 @@ export default function OnbActivity() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.beige }}>
-      <TopNav onBack={() => navigation.goBack()} stepText="5 / 7" />
+      <TopNav onBack={() => navigation.goBack()} stepText="6 / 8" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 32, paddingTop: insets.top + 80, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 05</Text>
+        <Text style={{ fontSize: 13, letterSpacing: 3, fontWeight: '700', color: C.green }}>ÉTAPE 06</Text>
         <Text style={{ fontFamily: F.display, fontWeight: '900', fontSize: 32, color: C.green, marginTop: 8, marginBottom: 6, lineHeight: 34 }}>
           Ton niveau d'activité ?
         </Text>
@@ -100,7 +100,7 @@ export default function OnbActivity() {
         <View style={{ flex: 1, minHeight: 40 }} />
 
         <View style={{ marginTop: 24, marginBottom: 16 }}>
-          <OnboardingProgress step={5} total={7} />
+          <OnboardingProgress step={6} total={8} />
         </View>
         <Pressable onPress={() => navigation.navigate('Restrictions')} style={btnDark()}>
           <Text style={btnDarkLabel}>Continuer</Text>
