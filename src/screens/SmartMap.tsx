@@ -158,7 +158,7 @@ function FridgeCard({ f, isSel, onPress, bg }: { f: FridgeItem; isSel: boolean; 
         {f.open ? (
           isSel ? (
             <View style={{ marginLeft: 'auto', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: C.green }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander →</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: C.beige }}>Commander</Text>
             </View>
           ) : (
             <View style={{ marginLeft: 'auto', paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1.5, borderColor: C.green }}>

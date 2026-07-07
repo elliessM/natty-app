@@ -25,9 +25,9 @@ export const SCANNER_DEFAULT_IMAGE = flickr('chicken,rice,plate,grilled,healthy'
 
 /** Fridge / location hero photos (keyed by fridge id). */
 export const FRIDGE_IMAGES: Record<string, string> = {
-  fcnation: flickr('gym,fitness,club,paris,interior', 301),
-  szconfluence: flickr('sport,gym,modern,fitness,studio', 302),
-  urbrepub: flickr('workout,gym,urban,fitness,club', 303),
+  fpcompans: flickr('gym,fitness,club,interior', 301),
+  szjeannedarc: flickr('sport,gym,modern,fitness,studio', 302),
+  urbcapitole: flickr('workout,gym,urban,fitness,club', 303),
 };
 
 /** Closest fridge hero on Dashboard. */

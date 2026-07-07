@@ -8,14 +8,15 @@ export type Fridge = {
   open: boolean;
 };
 
-// Mock fridges around Paris 11e — coords approximatives.
+// Mock fridges — Toulouse, autour du quartier Compans-Caffarelli.
 export const FRIDGES: Fridge[] = [
-  { id: 'fcnation', name: 'Fitness Club Nation', addr: '12 Rue de la Santé', lat: 48.8586, lng: 2.3767, stockCount: 8, open: true },
-  { id: 'szconfluence', name: 'SportZone Confluence', addr: '4 Quai des Sportifs', lat: 48.8462, lng: 2.3745, stockCount: 12, open: true },
-  { id: 'urbrepub', name: 'Urban Gym République', addr: '67 Rue République', lat: 48.8675, lng: 2.3642, stockCount: 0, open: false },
+  { id: 'fpcompans', name: 'Fitness Park Compans', addr: '2 Bd Lascrosses', lat: 43.6103, lng: 1.4326, stockCount: 12, open: true },
+  { id: 'szjeannedarc', name: "SportZone Jeanne d'Arc", addr: "5 Pl. Jeanne d'Arc", lat: 43.6087, lng: 1.4458, stockCount: 8, open: true },
+  { id: 'urbcapitole', name: 'Urban Gym Capitole', addr: "8 Rue du Poids de l'Huile", lat: 43.6045, lng: 1.4442, stockCount: 0, open: false },
 ];
 
-export const PARIS_CENTER = { lat: 48.8566, lng: 2.3522 };
+// Fallback sans géoloc : jardin Compans-Caffarelli, Toulouse.
+export const COMPANS_CENTER = { lat: 43.6112, lng: 1.4337 };
 
 // Haversine distance in meters.
 export function distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {

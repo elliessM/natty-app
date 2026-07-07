@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import { PARIS_CENTER } from '../data/fridges';
+import { COMPANS_CENTER } from '../data/fridges';
 
 export type LatLng = { lat: number; lng: number };
 
@@ -14,11 +14,11 @@ type LocationState = {
 /**
  * Returns a best-effort location:
  *  - Real coords if permission granted
- *  - Paris center as fallback (so UI can still render distances)
+ *  - Compans-Caffarelli (Toulouse) as fallback (so UI can still render distances)
  */
 export function useLocation(): LocationState {
   const [state, setState] = useState<LocationState>({
-    coords: PARIS_CENTER,
+    coords: COMPANS_CENTER,
     loading: true,
     granted: false,
     error: null,
@@ -31,7 +31,7 @@ export function useLocation(): LocationState {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (cancelled) return;
         if (status !== 'granted') {
-          setState({ coords: PARIS_CENTER, loading: false, granted: false, error: null });
+          setState({ coords: COMPANS_CENTER, loading: false, granted: false, error: null });
           return;
         }
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
@@ -44,7 +44,7 @@ export function useLocation(): LocationState {
         });
       } catch (e: any) {
         if (cancelled) return;
-        setState({ coords: PARIS_CENTER, loading: false, granted: false, error: String(e?.message ?? e) });
+        setState({ coords: COMPANS_CENTER, loading: false, granted: false, error: String(e?.message ?? e) });
       }
     })();
     return () => {
