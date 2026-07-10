@@ -7,11 +7,15 @@ type AuthState = {
   user: User | null;
   loading: boolean; // true pendant le bootstrap initial
   signingIn: boolean;
+  // Mode démo (jury) : session 100 % locale, aucun compte Supabase.
+  // Non persisté : un refresh ramène à l'écran d'auth.
+  demoMode: boolean;
   error: string | null;
 
   bootstrap: () => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<boolean>;
   signUpWithPassword: (email: string, password: string, name: string) => Promise<boolean>;
+  enterDemo: () => void;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ ok: boolean; error?: string }>;
   clearError: () => void;
@@ -22,6 +26,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: true,
   signingIn: false,
+  demoMode: false,
   error: null,
 
   bootstrap: async () => {
@@ -69,9 +74,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return true;
   },
 
+  enterDemo: () => set({ demoMode: true, error: null }),
+
   signOut: async () => {
     await supabase.auth.signOut();
-    set({ session: null, user: null });
+    set({ session: null, user: null, demoMode: false });
   },
 
   deleteAccount: async () => {

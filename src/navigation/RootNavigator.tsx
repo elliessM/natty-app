@@ -17,6 +17,7 @@ const Stack = createNativeStackNavigator<RootStackParamList & { Auth: undefined 
 export default function RootNavigator() {
   const hasOnboarded = useUserStore((s) => s.hasOnboarded);
   const session = useAuthStore((s) => s.session);
+  const demoMode = useAuthStore((s) => s.demoMode);
   const loading = useAuthStore((s) => s.loading);
   const bootstrap = useAuthStore((s) => s.bootstrap);
 
@@ -35,7 +36,7 @@ export default function RootNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!session ? (
+        {!session && !demoMode ? (
           <Stack.Screen name="Auth" component={AuthScreen} />
         ) : !hasOnboarded ? (
           <Stack.Screen name="Onboarding" component={OnboardingStack} />

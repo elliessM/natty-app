@@ -4,18 +4,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C, F, withAlpha } from '../tokens';
 import Ambience from '../shared/Ambience';
 import { useAuthStore } from '../store/useAuthStore';
+import { useUserStore } from '../store/useUserStore';
 import { hapticLight, hapticSelection, hapticWarning } from '../shared/haptics';
 
 type Mode = 'signin' | 'signup';
 
-// Inscription désactivée temporairement : seul le mode connexion est accessible.
-// Repasser à `true` pour réafficher le bouton "Créer un compte" et réactiver l'inscription.
-const SIGNUP_ENABLED = false;
+// Passer à `false` pour masquer le bouton "Créer un compte" et désactiver l'inscription.
+const SIGNUP_ENABLED = true;
 
 export default function AuthScreen() {
   const insets = useSafeAreaInsets();
   const signIn = useAuthStore((s) => s.signInWithPassword);
   const signUp = useAuthStore((s) => s.signUpWithPassword);
+  const enterDemo = useAuthStore((s) => s.enterDemo);
   const signingIn = useAuthStore((s) => s.signingIn);
   const error = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
@@ -35,6 +36,13 @@ export default function AuthScreen() {
     hapticLight();
     const ok = mode === 'signin' ? await signIn(email, password) : await signUp(email, password, name);
     if (!ok) hapticWarning();
+  };
+
+  const startDemo = () => {
+    hapticLight();
+    // Chaque démo repart de l'étape restrictions, même si l'appareil a déjà onboardé.
+    useUserStore.getState().setHasOnboarded(false);
+    enterDemo();
   };
 
   return (
@@ -177,6 +185,33 @@ export default function AuthScreen() {
             </Text>
           </Pressable>
         ) : null}
+
+        {/* Accès démo (jury) : saute l'auth et démarre l'onboarding aux restrictions */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 22 }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: withAlpha(C.beige, 0.18) }} />
+          <Text style={{ fontSize: 10, letterSpacing: 2, color: C.beige, opacity: 0.5, fontWeight: '700' }}>OU</Text>
+          <View style={{ flex: 1, height: 1, backgroundColor: withAlpha(C.beige, 0.18) }} />
+        </View>
+
+        <Pressable
+          onPress={startDemo}
+          disabled={signingIn}
+          style={{
+            marginTop: 18,
+            height: 52,
+            borderRadius: 26,
+            borderWidth: 1.5,
+            borderColor: withAlpha(C.lime, 0.6),
+            backgroundColor: withAlpha(C.lime, 0.1),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ color: C.lime, fontWeight: '700', fontSize: 15 }}>Voir la démo</Text>
+        </Pressable>
+        <Text style={{ textAlign: 'center', fontSize: 11, color: C.beige, opacity: 0.55, marginTop: 10, lineHeight: 15 }}>
+          Explore l'app sans créer de compte.
+        </Text>
 
         <View style={{ flex: 1, minHeight: 30 }} />
 
