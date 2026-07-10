@@ -783,7 +783,17 @@ export default function Profile() {
         <Card title="SESSION" subtitle={authEmail ? `Connecté en tant que ${authEmail}` : 'Mode local'}>
           <Pressable
             onPress={() => {
-              Alert.alert('Se déconnecter ?', 'Tes données cloud restent sauvegardées — tu pourras les retrouver en te reconnectant.', [
+              const title = 'Se déconnecter ?';
+              const msg = 'Tes données cloud restent sauvegardées — tu pourras les retrouver en te reconnectant.';
+              // Alert.alert avec boutons est un no-op sur web : window.confirm prend le relais en PWA.
+              if (Platform.OS === 'web') {
+                if (window.confirm(`${title}\n\n${msg}`)) {
+                  hapticWarning();
+                  signOut();
+                }
+                return;
+              }
+              Alert.alert(title, msg, [
                 { text: 'Annuler', style: 'cancel' },
                 {
                   text: 'Se déconnecter',
